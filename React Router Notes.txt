@@ -1,0 +1,401 @@
+//install react router by following command
+npm install react-router-dom
+
+//usage
+import {Route} from 'react-router-dom'
+Route is a component that allows us to define a certain path and react component that should be loaded when that path becomes active in url.
+
+Route component requires a path prop. path prop should be url. when we have that url in browser then Route becomes active.
+We define the component that should be loaded inside the Route component.
+Route will make sure that component inside it will be loaded only if url is active.
+
+<Route path="/someUrl">
+ <Component/>
+</Route>
+
+but to activate react router and to make Route components and other react router features work, we need to go to root file and import {BrowserRouter} from 'react-router-dom'. wrap root component (App) with <BrowserRouter></BrowserRouter> component.
+
+(the components we use as different pages in our application (loaded as a route), we should store them in folder named pages or screens. (components, pages/screens))
+
+//Links
+import {Link} from 'react-router-dom'
+
+Link component allows us to create a link.
+it is just like a <a></a> tag. but Link take 'to' as a prop instead of 'href'.
+when we click on Link it prevents browser default and manually update the url.
+
+//NavLinks
+import {NavLink} from 'react-router-dom'
+
+if we want to style the link which is active then we should use NavLink.
+it is same as Link but it has 'activeClassName' prop. there we define a class which should apply when link is active.
+
+<NavLink activeClassName={style.class} to="/someUrl"></NavLink>
+
+//dynamic routes with params
+we define dynamic paths using params.
+we define params with (/:anything)
+
+we can access those params in component with a custom hook called useParams imported from react-router-dom
+useParams returns a params object. this object will have key, value pairs.
+keys will be dynamic segment leading to that page and values will be params we get.
+
+example:-
+<Link to="/:someValue"></Link>
+
+const params = useParams()
+
+we can access that dynamic value using {params.someValue}
+
+//switch and exact
+react router matches the start of path and renders it. if two routes are starting from same name then both will be render according to their order.
+
+<Route path="/home">
+    <Component/>
+</Route>
+<Route path="/products">
+    <Component/>
+</Route>
+<Route path="/products/:productId">
+    <Component/>
+</Route>
+
+in above example both will be rendered.
+
+we can wrap routes component in Switch component imported from react-router-dom.
+
+but switch component will only render one component. means the first component it finds the match with. (it goes from top to bottom and if it finds starting match then it stops and render it.)
+in above example it will render only /products. we can change the order to render /products/:productId.
+
+but we can use exact prop
+
+<Switch>
+    <Route path="/home">
+        <Component/>
+    </Route>
+    <Route path="/products" exact>
+        <Component/>
+    </Route>
+    <Route path="/products/:productId">
+        <Component/>
+    </Route>
+</Switch>
+
+exact prop tells react router that it should render only if it is exact match. (not just starting match)
+
+//nested routes
+we can define routes wherever we want.
+
+like from above example we can have one more route in home component.
+
+/home
+
+const Component = () => {
+    return <Section>
+                home
+                <Route path="/home/something">
+                    <p>Something</p>
+                </Route>
+            </Section>
+}
+
+/home will render only home
+and /home/something will render home and Something (both) components.
+
+(we can't only render something component with exact prop on home)
+
+//Redirect
+
+we can redirect to specific path using Redirect component imported from react-router-dom
+
+<Switch>
+    <Route path="/" exact>
+        <Redirect to="/home"/>
+    </Route>
+    <Route path="/home">
+        <Component/>
+    </Route>
+    <Route path="/products" exact>
+        <Component/>
+    </Route>
+    <Route path="/products/:productId">
+        <Component/>
+    </Route>
+</Switch>
+
+in above example we are redirecting from / to /home. if we visit only / then we will be redirected to /home.
+
+(we need to pass exact prop on it because if we dont then / means starts with / and every path will be match and we will be redirecting every time causing infinte loop.)
+
+//not found page
+we define new route with path of '*' and render not found page in there.
+
+in switch we define all the routes application supports and if we go through switch and didn't find any match then we leave switch without a match and nothing shows up on the screen. Hence to show fallback like not found page, we add a route at the end which is looked at if no other route matched, where we match all incomming requests. with path of '*'.'*' tells react router that any url, any path should match this route. thats why this route should be define last so it doesn't consume one of the requests of actual routes we have.
+
+//programmatic (imperative) navigation
+if we want to navigate manually like after submiting form as example. we can use useHistory hook from react-router-dom.
+useHistory gives us history object. on that history object get get methods like push and replace. in that method we pass path.
+
+with push we are adding a new page. hence we can go back with back button.
+with replace we are replacing with new page. hence we can't go back with back button.
+
+(
+    const history - useHistory()
+
+    history.push('/someUrl')
+)
+
+if path we are passing to history.push() is more complex and long then to make it more readable we can pass an object in history.push(). it also takes object with pathname and search
+
+(
+    history.push({
+        pathname: '/someUrl',
+        search: '?key=value'
+    })
+)
+
+//Prompt
+it is a component given by react router to avoid unwanted route transition.
+like when user navigates away from current page and we want to show Prompt asking 'Are you sure you want to leave?'
+
+Prompt component takes when and message props.
+in when prop we pass true or false defining whether Prompt should be shown when user changes url.
+in message prop we pass a function that returns a string which is shown as message. and this function gets location as default argument which is an object that holds the imformation about the page user is navigating to.
+
+//query parameters
+when we use normal parameters (:parameter), route changes
+query parameter (?key=value) is optional, when we use query parameter route doesn't change, but matched route gets access to that query parameter.
+
+we can add query parameter using history.push or history.replace (depending on what behaviour we want) imported from useHistory.
+
+(
+    history.push('/route?key=value)
+)
+
+now we can access that query parameter by useLocation hook imported from react-router-dom
+useLocation gives us location object which hold imformation.
+like hash,key,pathname,search etc.
+on location.search we get access to query parameter
+
+(
+    location = {
+        pathname = '/route',
+        search = '?key=value'
+    }
+)
+
+but query parameter in form of object is more useful that in form of string.
+
+we can convert it into object using new URLSearchParams().
+it is a constructor function built into javascipt.
+
+into that constructor function we can pass location.search. it gives back an object where we can extract query parameter value by key.
+
+(
+    const queryParams = new URLSearchParams(location.search)
+    const queryParamsValue = queryParams.get('key')
+    queryParamsValue will give us the value stored for the key we pass in get()
+)
+
+//more flexible routing code with useRouteMatch() hook.
+if we decide to change route pathname then we also have to change all nested route pathname. that would be difficult to manage.
+
+in this situation we can use useRouteMatch() hook. it is similar to useLocation but it hold more imformation than useLocation, like internally managed data
+
+(
+    import {useRouteMatch} from 'react-router-dom'
+
+    const match = useRouteMatch()
+
+    match is an object with properties like,
+    {
+        isExact: false,
+        params: {paramName: value},
+        path: '/something/:something', (it is not actual path but the path defined by us)
+        url: '/something/something' (it is actual path url)
+    }
+
+    etc.
+
+    now we can use these properties in nested routes and links. so if we change pathname in future, then all nested routes and links will be updated automatically.
+)
+
+//////////////////////////////////////////////////////////////////////////
+react router version 6 upgrade
+//Routes
+in react router version 6 we cant use switch anymore. instead we import Routes and wrap it around Route.
+
+//Route
+We define the component (that should be loaded when given path is active) in element prop on Route.
+
+(
+    <Routes>
+        <Route path='/welcome' element={<SomeComponent/> or JSX element}/>
+    </Routes>
+)
+
+//exact
+now we dont have to pass exact prop on Route. In version 5 without exact prop react router used to load all the component whose path started with given path. but in version 6 react router always looks for exact path match by default. also order of routes doesn't matter anymore because react router looks for exact path match by default.
+
+if we want that behaviour of loading all the components whose path started with given path then we need pass '/*' at the end of path prop value on Route.
+(
+    <Route path='/welcome/*' element={<SomeComponent/>}/>
+    <Route path='/welcome/home' element={<SomeComponent2/>}/>
+)
+
+//NavLink
+NavLink now doesn't have activeClassName prop.
+now it takes className or style prop.
+both props works on NavLink in different way.
+both take a function with default argument of navigation data (we can call it navData) which gives us some imformation about NavLink and current state of navigation.
+on that navData object we get isActive property which will be true if NavLink is active.
+with help of it we can return a className dynamically.
+
+(
+    <NavLink className={(navData) => {
+        return navData.isActive ? someClass : someClass2
+    }} to='/welcome'>something</NavLink>
+)
+
+//Navigate instead of Redirect
+<Navigate to='/welcome'/>
+
+replace prop on Navigate
+without replace prop we will only push page to stack.
+but with replace prop we will replace the current page.
+
+(
+    <Routes>
+        <Route path='/' element={<Navigate replace to='/welcome'/>}/>
+        <Route path='/welcome/*' element={<SomeComponent/>}/>
+        <Route path='/welcome/home' element={<SomeComponent2/>}/>
+    </Routes>
+)
+
+//Link and NavLink
+'to' prop on both Link and NavLink is now relative to component route path.
+
+(
+    <Link to='someNewUrl'>SomeLink</Link>
+)
+
+//nested Route
+nested routes should be wraped by Routes Component. also path of nested route is relative to parent component route path.
+
+caution:
+by default react router 6 looks for exact match of the path. thats why if we want to render nested component then we should pass '/*' to path prop value on parent Route.
+
+(
+    <Routes>
+        <Route path='/welcome/*' element={<SomeComponent/>}/>
+    </Routes>
+
+    (
+        nested component in SomeComponent
+        <Routes>
+            <Route path='somePath' element={<SomeComponent2/>}/>
+        </Routes>
+    )
+)
+
+//alternate way to define nested routes (prefered way)
+it is good practice to define all the routes at one central place so it will be easy to manage all routes.
+
+we pass nested Route as a children of parent Route.
+
+to define where the nested content should be added in dom, we use Outlet imported from react route dom.
+we use Outlet as a placeholder to tell react where the nested route content should be inserted.
+
+(
+    <Route path='/welcome/*' element={<SomeComponent/>}>
+        <Route path='someUrl' element={<SomeComponent2/>}/>
+    </Route>
+
+    const SomeComponent = () => {
+        return <div>
+                <p>Text</p>
+                <Outlet/>
+            </div>
+    }
+)
+
+//programmatic navigation (useNavigate instead of useHistory)
+in react router 6 we don't have useHistory hook.
+instead we have useNavigate hook.
+
+we get navigate function from useNavigate
+we execute navigate function and pass url as argument to programmatically navigate
+to redirect we can pass another argument to navigate function. an object with {replace : true}
+we can also pass a number as an argument to navigate function, like 1 (for next page), -1 (for previous page), -2(for page before previous page) etc.
+
+(
+    const navigate = useNavigate()
+    navigate('/someUrl')
+    or
+    navigate('/someUrl', {replace: true})
+    or
+    navigate(1) or navigate(-1) or navigate(-3) etc.
+
+)
+
+//index route
+when we have nested route and we want to render it at parent url then we use index Route.
+
+(
+    <Route path='/welcome/*' element={<SomeComponent/>}>
+        <Route index element={<SomeComponent3/>}/>
+        <Route path='someUrl' element={<SomeComponent2/>}/>
+        <Route path='someUrl2' element={<SomeComponent3/>}/>
+    </Route>
+
+    SomeComponent3 will render at /welcome and also at /welcome/someUrl2
+)
+
+//useSearchParams
+useSearchParams gives us back 2 things.
+1. searchParams object
+2. setSearchParams function
+
+using setSearchParams function we can add or remove search parameter.
+
+(
+    setSearchParams({filter: 'active'}) --- ?filter='active'
+    setSearchParams({sort: 'ascending'}) --- ?sort='ascending'
+    setSearchParams({}) --- remove search parameter
+)
+
+using searchParams object we can read search parameter
+on searchParams object we get 'get()' function. in get function we pass parameter name and compare it's value as required.
+
+(
+    url = welcome/?filter=active
+
+    const something = searchParams.get('filter') === 'active'
+    const something2 = searchParams.get('filter') === 'inActive'
+
+    (something will be true in our case)
+    (something2 will be false in our case)
+)
+
+//lazy load routes
+we can use React.lazy and React.Suspense for lazy loading of routes.
+
+(using React.lazy we can reduce the amount of code needed during initial load.)
+
+React.lazy is a function which takes another function as argument which calls dynamic import
+
+(
+    React.lazy(() => import('./components/component'))
+)
+
+1. export component as default
+2. import component as dynamic import (const LazyComponentName = React.Lazy(() => import('./components/component')))
+
+promise is returned from dynamic import which is converted into a module that contains default exported react component.
+
+then we include LazyComponentName in route configuration and wrap component with React.Suspense
+on React.Suspense we need to specify a fallback prop which can be any react component, element or JSX.
+
+(
+    <Route path='/' element={<React.Suspense fallback={react element}><LazyComponentName/></React.Suspense>}/>
+)

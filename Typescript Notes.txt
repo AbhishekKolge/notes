@@ -1,0 +1,203 @@
+typescript's type system only helps during development. (before code gets compiled)
+
+//core types
+
+1. number - 1,5.3,-10 - all numbers, no differentiation between integers or floats.
+2. string - 'hi', "hi", `hi` - all text values
+3. boolean - true, false - no truthy or falsy values.
+4. object - {age: 30} - any javascript object, more specific types (type of object) are possible
+5. array - [1,2,3] - any javascript array, type can be flexible or strict (regarding the element types)6. tuple - added by typescript: fixed length array
+6. enum (custom type) - enum Value {NEW, OLD} - added by typescript: automatically enumerated global constant identifiers
+7. any - any kind of value, no specific type assignment
+
+if we create a variable with unassigned way then we need to aside it with type.
+(
+    const num1 = 1 (assigned)
+
+    let num1: number (unassigned)
+    num1 = 1
+)
+
+//objects
+
+let object: {
+  name: string;
+  age: number;
+  status?: string;
+};
+
+object = {
+  name: 'abhishek',
+  age: 25,
+};
+
+//arrays
+
+let array: string[]
+array = ['test', 'test2']
+
+let array: number[]
+array = [1, 2]
+
+let array: any[]
+array = ['test', 1]
+
+//tuple
+
+(
+    let tuple (by default it gets type of (string | number) [])
+    tuple = ['test', 1] or tuple = [1, 2] or tuple = ['test', 'test2']
+)
+
+let tuple: [string, number]
+tuple = ['test', 1]
+
+(tuple has length check exception if we use push method on array)
+
+//enums (custom type)
+enum Value {SOMETHING, SOMETHING2}
+(identifiers automatically gets value of 1 and 2 respectively)
+
+enum Value {SOMETHING = 5, SOMETHING2}
+(we can also set manual value and next identifier will get incremented value from previous value)
+
+enum Value {SOMETHING = 4, SOMETHING2 = 8}
+(we can also set manual value to every identifier)
+
+enum Value {SOMETHING = 'someText', SOMETHING2 = 8}
+(we can also set text as a value)
+
+const enum = Value.SOMETHING (const enum will get value of 0 or the value we declared on identifier)
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+//union type
+we can define more than one type
+const someText = string | number | boolean
+
+const combine = (input1: number | string, input2: number | string) => {
+    let result: string | number
+    if(typeof input1 === 'number' && typeof input2 === 'number') {
+        result = input1 + input2
+    } else {
+        result = input1.toString() + input2.toString()
+    }
+    console.log(result)
+}
+
+combine(1,2)
+
+depending on logic, we might need runtime type check or not.
+
+here we are doing different things depending on the types, hence we are also doing runtime type checking.
+
+//literal type
+we can set specific value as a type
+(we dont have to remember the specific value because typescript will throw error if we use different value check)
+
+const someText: 'as-number' | 'as-text'
+
+if(someText === 'as-number') {
+    console.log('number')
+}
+
+if(someText === 'as-text') {
+    console.log('text')
+}
+
+if we compare another value to someText then typescript will throw error.
+
+//type aliases
+
+we can store complex types in type aliases to reuse it again
+
+type Something = number | string
+const value: Something
+
+type Something2 = 'as-number' | 'as-text'
+const value: Something2
+
+type Something3 = {
+    text1: string
+    text2: number
+    text3: boolean
+}
+const value: Something3
+
+//type of return value of function
+return value type will get applied to function by default. we dont have to explicitly define it.
+the function which doesn't return anything will get void as a type.
+
+1. (return type number)
+const add = (num1: number, num2: number): number => {
+    return num1 + num2
+}
+
+2. (function doesn't return anything hence type of void)
+const add = (num1: number, num2: number): void => {
+    const something = num1 + num2
+}
+
+3. (function with return keyword but doesn't return anything will get type of undefined)
+
+but we dont have to give type of undefined explicitly. by default it will also get type of void. it doesn't make difference unless function should produce undefined and we want to be clear about it.
+
+const add = (num1: number, num2: number): undefined => {
+    const something = num1 + num2
+    return
+}
+
+//function type
+we can define function type by using 'Function' as a type.
+but it can be any function. we should be clear about what type of function it should be.
+we can set the function type using,
+
+let value = (num1: number, num2: numbers) => number
+(in parameter we can give any name with type defined and provide return type)
+
+//function type and callbacks
+
+const add = (num1: number, num2: number, someCallbackFunction: (num: number) => number): number => {
+    const something = num1 + num2
+    const result = someCallbackFunction(something)
+    return result
+}
+
+add(1, 2, (num) => {
+    return (num / 2)
+})
+
+//unknown type
+unknown is similar to any time. any is very flexible type but unknown is restrictive because with unknown we need to add extra runtime type checking.
+we should't use unknown always. but we can use it if we want to be more restrictive when we dont know the type in advance, but we know, what we want to do with it eventually.
+
+let someVariable = unknown
+let someVariable2 = string
+
+someVariable = 2
+someVariable = 'test'
+
+someVariable2 = someVariable (with any this can work. but with unknown it won't work.)
+
+we need to add extra runtime type checking to work.
+if(typeof someVariable === 'string') {
+    someVariable2 = someVariable
+}
+
+//never type
+it is another type functions can return.
+we can use it in utility function that throws error or infinite loop function.
+
+(
+    when normal function doesn't return anything and if we console.log that function we get undefined. but if we console.log function that throws error or function that is infinite loop we dont get anything in console. (not even undefined). means these function never return anything and crashes our script. thats why it should have return type of never.
+)
+
+const errorFunction = (msg: string, code: number): never => {
+    throw {message: msg, errorCode: code}
+}
+
+const infiniteLoopFunction = (): never => {
+    while (true) {
+        console.log('never');
+    }
+}

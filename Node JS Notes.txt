@@ -1,0 +1,691 @@
+Node js is an environment to run javascript outside the browser.
+It is built on top of chrome's v8 engine.
+
+we can evaluate node js code in two ways
+1. REPL (Read–eval–print loop) :- (for demo or playing)
+2. CLI :- (for serious applications)
+
+////////////////////////////
+global variables
+
+In node js we don't have window object, instead we have some global variables we can access, like
+
+__dirname  - path to current directory
+__filename - path with file name
+require    - function to use modules (CommonJS)
+module     - info about current module (file)
+process    - info about environment where the program is being executed
+
+///////////////////////////
+modules
+
+we should separate our code instead of writing everything in one file. (separation of concern) so we can debug and manage our code in future.
+
+in javascript we have modules like import something from './somePath'
+
+in node we also have modules but syntax is different because node uses CommonJS for modules.
+
+we export by using :- module.exports = something (default) or 
+module.exports.something = [] (named)
+
+we import by using :- const something = require('./somePath') (default) or 
+const {something} = require('./somePath') (named)
+
+if we invoke a function in a file, import it without storing in a variable then that function will always invoke. because when node exports a module, node will wrap it as a function under the hood and when we import it, node will invoke that function.
+
+//////////////////////////
+built in modules
+
+os, path, fs, http are some of the built in modules in node.
+
+/////////////////////////
+npm (third party modules)
+node package manager (npm) comes preinstalled with node. it can be used for using own code in our different projects, using other developers code in our project or making our code available for other developers.
+
+npm commands
+npm - global command
+npm -v or npm --version (checking version)
+
+two type of dependencies
+1. local dependency- use it in particular project
+npm install <packageName> (dependencies)
+
+npm install <packageName> -D or --save-dev (dev-dependencies. dependencies that are require only for development.)
+
+2. global dependency- use it in any project
+npm install -g <packageName>
+sudo npm install -g <packageName> (mac)
+(with introduction of npx there is no need to install packages globally.)
+
+package.json - manifest file that stores important information about project and package
+we can create package.json in 3 ways.
+1. creating package.json file in root manually and create properties in that file.
+2. npm init command. (step by step. we can press enter to skip step)
+3. npm init -y (everything will be default. we can change it later in file manually.)
+
+when we install any package/module/dependency from npm then in package.json it's entry is added with its name and version in dependencies object.
+
+the package gets added in folder named as node_modules.
+
+when we want to share our project we don't share node_modules folder because it can be large sized. but when we use that shared project we use (npm install) command. it will look into package.json and automatically install required dependencies with version specified in package.json.
+
+to uninstall any package we need to execute (npm uninstall <packageName>)
+or
+we can use no clear approach to uninstall package.
+we need to delete node_modules folder, package-lock.json and remove package entry in package.json file. then run npm install.
+
+////////////////////////
+nodemon
+it is an npm package we can use to restart the node server automatically. we should install it as a dev dependency, because when we push our project to production, we will use something serious like pm2 to start the server.
+
+in package.json we can add scripts that can be run by commands.
+like,
+"start": "node app.js" (npm start or npm run start)
+"dev": "nodemon app.js" (npm run dev)
+
+//package-lock.json
+sometimes installed package has its own dependencies, like bootstrap has popper.js dependency.
+package-lock.json keep track of all dependencies and versions.
+in version we have 3 values.
+1.0.0
+first value represents major changes.
+second value represents minor changes.
+third value represents bug fixes.
+
+/////////////////////////////////
+event loop
+the event loop allows node js to perform non-blocking input and output operations (despite javascript is single threaded) by offloading operations to the system kernel whenever possible.
+
+example:
+if there is some time consuming task to be executed then javascript registers it as a callback and it gets put at the end. when there is no immediate code to run then this callback will get executed.
+
+/////////////////////////////////////
+asynchronous
+
+promise-
+we create promise by creating new instance of promise. it takes a callback function as argument. that callback function gets two arguments, resolve and reject. we run our code in that callback function then pass result in resolve method and if there is error then we pass that error in reject method.
+
+this promise we store in variable or return in function.
+
+attach then and catch method to get result and err respectively.
+or 
+we can use async await with try catch method. (prefer)
+
+const someVariable = new Promise((resolve, reject) => {
+    //some code
+    if(err) {
+        reject(err)
+    }
+
+    resolve(result)
+})
+
+or
+
+const someFunction = () => {
+    return new Promise((resolve, reject) => {
+        //some code
+        if(err) {
+            reject(err)
+        }
+
+        resolve(result)
+    })
+}
+
+//using then and catch
+someVariable.then((result) => {}).catch((err) => {})
+someFunction().then((result) => {}).catch((err) => {})
+
+or
+
+//using async await with try catch method
+const start = async () => {
+    try {
+        const someVariable2 = await someFunction() 
+        console.log(someVariable2)
+        //run required code
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+start()
+
+//now to make it more simple, we dont have to write wrapping function that returns promise. we can use util module. util module includes promisify method which we can use to return promise.
+
+(
+    const fs = require('fs');
+    const util = require('util');
+    const readFilePromise = util.promisify(fs.readFile);
+    const writeFilePromise = util.promisify(fs.writeFile);
+
+    (we can use it in async function like:)
+    await readFilePromise()
+)
+
+//we can make it even more simple. we dont have to import util and use the promisify method. instead we can add (.promises) in front of fs module while importing it. it does the same thing like importing util and using promisify method.
+
+(
+    const fs = require('fs').promises
+
+    (we can use it in async function like:)
+    await fs.readFile()
+)
+
+///////////////////////////////////////////////////////////
+events
+
+event driven programming is used heavily in node js.
+in event driven programming the flow of program is (at least in part) determined by the events that occur as the program executes.
+many built in modules in node js use events under the hood. hence event and event driven programming is big part of node js.
+
+////////////////////////////////////////////////////////////
+streams
+
+streams are use to write or read sequentially. when we have to handle and manipulate streaming data like continuous data or large file, streaming can be used. in node there are four different types of streams.
+1. writeable - to write data sequentially
+2. readable - to read data sequentially
+3. duplex - to do both read and write data sequentially
+4. transform - to modify data while reading or writing 
+
+like event, many built in modules in node js use streams under the hood.
+streams extend EventEmitter class.
+
+//exit node process
+//exit with success
+process.exit(0)
+//exit with error
+process.exit(1)
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+Express
+
+express is built on top of node js, specifically http module.
+
+//Notable well-known port numbers
+
+20	File Transfer Protocol (FTP) Data Transfer
+21	File Transfer Protocol (FTP) Command Control
+22	Secure Shell (SSH) Secure Login
+23	Telnet remote login service, unencrypted text messages
+25	Simple Mail Transfer Protocol (SMTP) email delivery
+53	Domain Name System (DNS) service
+67, 68	Dynamic Host Configuration Protocol (DHCP)
+80	Hypertext Transfer Protocol (HTTP) used in the World Wide Web
+110	Post Office Protocol (POP3)
+119	Network News Transfer Protocol (NNTP)
+123	Network Time Protocol (NTP)
+143	Internet Message Access Protocol (IMAP) Management of digital mail
+161	Simple Network Management Protocol (SNMP)
+194	Internet Relay Chat (IRC)
+443	HTTP Secure (HTTPS) HTTP over TLS/SSL
+546, 547	DHCPv6 IPv6 version of DHCP
+
+//status codes
+
+Informational responses (100 – 199)
+Successful responses (200 – 299)
+Redirection messages (300 – 399)
+Client error responses (400 – 499)
+Server error responses (500 – 599)
+
+//http verbs
+get: read data (default)
+post: insert data
+put/patch: update data
+delete: delete data
+
+get: www.store.com/api/orders (get all orders)
+post: www.store.com/api/orders (place an order. send data)
+get: www.store.com/api/orders/:id (get single order. path params)
+put/patch: www.store.com/api/orders/:id (update specific order. params + send data)
+delete: www.store.com/api/orders/:id (delete order. path params)
+
+//put vs patch
+when we use put, we are trying to replace existing resource.
+patch is for partial update.
+
+//API vs SSR
+API - JSON
+send data
+res.json()
+
+SSR - template
+send template
+res.render()
+
+//API
+An API, or Application Programming Interface, defines a way of communicating between software applications.
+
+//REST
+REST stands for Representational State Transfer, and is an architectural style of creating web services that communicate with web resources.
+
+//JSON
+JSON stands for JavaScript Object Notation, and is a standard text-based format that’s used to represent structured data.
+
+//environment variables
+we can use dotenv package.
+simply write all the secret variables in .env file then we can use dotenv package to access it.
+we invoke the config using,
+
+require('dotenv').config()
+
+we can access the variables using process.env.VARIABLE_NAME
+
+//not found middleware
+we can write app.use after all routes so if any request url does not match routes, we can catch it in our not found middleware. in that middleware we send response of not found
+
+const notFound = (req, res) => res.status(404).send("Route does not exist");
+
+//after all the routes
+app.use(notFound);
+
+//async wrappers (middleware)
+we can use async wrapper (middleware) for all of controllers because setting try catch for every controller is redundant.
+
+const asyncWrapper = (fn) => {
+  return async (req, res, next) => {
+    try {
+      await fn(req, res, next);
+    } catch (error) {
+        //pass the error to next middleware that handles errors
+      next(error);
+    }
+  };
+};
+
+we can also use npm packages that help us to handle this situation. (express-async-errors)
+
+//custom error handler middleware
+//we get err as first default argument
+const errorHandler = (err, req, res, next) => {
+  res.status(500).json({ msg: err.message });
+};
+
+//custom error class
+//create custom error class
+class CustomAPIError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
+//create function to use custom error class
+const createCustomError = (message, statusCode) => {
+  return new CustomAPIError(message, statusCode);
+};
+
+//whenever we encounter error we invoke function and pass it to next middleware that handles errors
+next(createCustomError(`No task found with id: ${taskID}`, 404));
+
+//or
+//we can directly use instance of CustomAPIError
+throw new CustomAPIError(message, statusCode)
+
+//we check if incoming error is instance of the custom error class and send response accordingly
+const errorHandler = (err, req, res, next) => {
+  if (err instanceof CustomAPIError) {
+    return res.status(err.statusCode).json({ msg: err.message });
+  }
+  return res
+    .status(500)
+    .json({ msg: "Something went wrong, please try again" });
+};
+
+//JWT (json web token)
+we can use jsonwebtoken package
+
+const jwt = require('jsonwebtoken')
+
+//create new token with sign method
+//in sign method we need to provide following arguments
+1. payload (id, role etc.) keep it small
+2. secret key (always keep it on server. it should be long, complex and unguessable string value) 256 bit secret. we can use allkeysgenerator.com to generate secret key.
+3. options
+
+//expiresIn:
+//if we provide only a number then it will be in seconds.
+//if we provide a string then we need to make sure that we add time units. (days, hours, etc.) otherwise millisecond unit is used by default ('120' is equal to '120ms')
+
+jwt.sign({id, role}, process.env.JWT_SECRET, {expiresIn: '30d'})
+
+//verify and decode token
+
+//passed as bearer token
+const token = req.headers.authorization.split(' ')[1]
+
+try {
+  const decode = jwt.verify(token, process.env.JWT_SECRET)
+  const {id, role} = decode
+  //we also get two more properties. iat (issued at) and exp (expiration)
+} catch(err) {
+  console.log(err.message)
+}
+
+//status codes
+rather than hard coding all the status codes and remembering all of those, we can use http-status-codes package
+
+//password hashing
+password hashing means generating random bytes and combining it with password before we pipe it through hash function which is a mathematical algorithm that maps data of any size to a bit string of fixed size.
+
+hashing cannot be reversed.
+
+we can use bcryptjs package for password hashing
+
+const bcrypt = require('bcryptjs')
+
+//generate salt which is just a random bytes
+//10 is default number of rounds. it means how many random bytes will be generated
+//if we increase rounds then more processing power will be required
+const salt = await bcrypt.genSalt(10)
+
+const hashedPassword = await bcrypt.hash(password,salt)
+
+//compare password
+
+await bcrypt.compare(password, hashedPassword)
+
+//set environment or global variables dynamically in postman
+
+go to the test tab of request where we get the token in response and write following code
+
+const jsonData = pm.response.json()
+pm.globals.set('TOKEN', jsonData.token)
+pm.environment.set('TOKEN', jsonData.token)
+pm.collectionVariables.set('TOKEN', jsonData.token)
+
+//security
+helmet: it sets various http headers to prevent numerous possible attacks.
+
+cors: it ensures that our api is accessible from different domain. if we don't have cors installed then we only be able to access data from same domain. cors stands for cross origin resource sharing. it is a mechanism to allow or restrict requested resources on web server depending on where the http request was initiated.
+
+xss-clean: sanitizes user input (query, params, body) and protects from cross site scripting attacks where the attacker tries to inject some miscellaneous code.
+
+express-mongo-sanitize: protects against mongo db injection
+
+express-rate-limit: limit the amount of requests user can make for every route or specific route.
+we can pass configuration.
+
+rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'Too many requests from this IP, please try again after 15 minutes'
+})
+
+If you are behind a proxy/load balancer (usually the case with most hosting services, e.g. Heroku, Bluemix, AWS ELB, Nginx, Cloudflare, Akamai, Fastly, Firebase Hosting, Rackspace LB, Riverbed Stingray, etc.), the IP address of the request might be the IP of the load balancer/reverse proxy (making the rate limiter effectively a global one and blocking all requests once the limit is reached) or undefined. To solve this issue, add the following line to your code (right after you create the express application):
+
+app.set('trust proxy', numberOfProxies)
+
+Where numberOfProxies is the number of proxies between the user and the server. To find the correct number, create a test endpoint that returns the client IP:
+
+app.set('trust proxy', 1)
+app.get('/ip', (request, response) => response.send(request.ip))
+
+Go to /ip and see the IP address returned in the response. If it matches your public IP address, then the number of proxies is correct and the rate limiter should now work correctly. If not, then keep increasing the number until it does.
+
+//file upload
+we send file using form data
+in node that file is not available by default. (we can't access it in req.body).
+we can use express-fileupload package to access that file.
+
+const fileUpload = require('express-fileupload')
+app.use(fileUpload())
+
+we can access the file using req.files
+const file = req.files.image
+
+we also get move function on that accessed file, which returns promise and we pass path argument where we want to move that file.
+await file.mv(path)
+
+we can also save files as temp files and delete those after uploading to cloud.
+to save files as temp we can pass options in fileUpload()
+fileUpload({
+  useTempFiles: true
+})
+
+if we enable useTempFiles then we get tempFilePath when we access the file using req.files
+
+//delete file
+const fs = require("fs").promises;
+
+await fs.unlink(path)
+
+//local upload
+const uploadProductImageLocal = async (req, res) => {
+  if (!req.files || !req.files.image) {
+    throw new BadRequestError("No file uploaded");
+  }
+  const productImage = req.files.image;
+
+  if (!productImage.mimetype.startsWith("image")) {
+    throw new BadRequestError("Please upload an image");
+  }
+
+  const maxSize = 1024 * 1024;
+
+  if (productImage.size > maxSize) {
+    throw new BadRequestError("Please upload an image smaller than 1 MB");
+  }
+
+  const imagePath = path.join(
+    __dirname,
+    `../../public/uploads/${productImage.name}`
+  );
+
+  await productImage.mv(imagePath);
+
+  res.status(StatusCodes.OK).json({
+    image: { src: `/uploads/${productImage.name}` },
+  });
+};
+
+//cloudinary
+we can use cloudinary to save files on cloud. it gives us 25 GB free storage.
+
+when we import cloudinary we should add v2
+const cloudinary = require('cloudinary').v2
+
+//in app.js we need to run config method
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET
+})
+
+//upload file with cloudinary,
+
+const result = await cloudinary.uploader.upload(path,{
+    use_filename: true,
+    folder: "folderName",
+})
+
+use_filename: if true it will use exact name of the file which we are passing
+folder: store to specific folder created on cloudinary
+
+we get file access url on result.secure_url
+
+//cloud upload
+const uploadProductImageCloud = async (req, res) => {
+  if (!req.files || !req.files.image) {
+    throw new BadRequestError("No file uploaded");
+  }
+
+  const productImage = req.files.image;
+
+  if (!productImage.mimetype.startsWith("image")) {
+    throw new BadRequestError("Please upload an image");
+  }
+
+  const maxSize = 1024 * 1024;
+
+  if (productImage.size > maxSize) {
+    throw new BadRequestError("Please upload an image smaller than 1 MB");
+  }
+
+  const result = await cloudinary.uploader.upload(productImage.tempFilePath, {
+    use_filename: true,
+    folder: "file-folder",
+  });
+
+  await fs.unlink(productImage.tempFilePath);
+
+  res.status(StatusCodes.OK).json({
+    image: { src: result.secure_url },
+  });
+};
+
+//Email with nodemailer
+nodemailer will setup the logic but we need some transporter (service) that will do the email sending part.
+
+//transport service
+for development we can use services like ethereal or mailtrap
+for production we can use sendgrid or mailgun
+
+//Ethereal
+
+const nodemailer = require("nodemailer");
+const { StatusCodes } = require("http-status-codes");
+
+const sendEmailDev = async (req, res) => {
+  const testAccount = await nodemailer.createTestAccount();
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    auth: {
+      user: "laurel.walsh@ethereal.email",
+      pass: "WZmY8tQQ2tcS1RG4G8",
+    },
+  });
+
+  const info = await transporter.sendMail({
+    from: '"Abhishek Kolge" <abhishekkolge96@gmail.com>',
+    to: "abhishek@digitalsalt.in.com, abhishekkolge96@gmail.com.com",
+    subject: "Hello World",
+    text: "Hello world",
+    html: "<b>Sending Emails with Node.js and Ethereal</b>",
+  });
+
+  res.status(StatusCodes.OK).json({ info });
+};
+
+//sendgrid
+const nodemailer = require("nodemailer");
+const { StatusCodes } = require("http-status-codes");
+
+const sendEmailProd = async (req, res) => {
+  const transporter = nodemailer.createTransport({
+    host: "smtp.sendgrid.net",
+    port: 587,
+    auth: {
+      user: "apikey",
+      pass: process.env.SENDGRID_API_KEY,
+    },
+  });
+
+  const info = await transporter.sendMail({
+    from: '"Abhishek Kolge" <abhishekkolge96@gmail.com>',
+    to: "abhishek@digitalsalt.in, abhishekkolge96@gmail.com",
+    subject: "Hello World",
+    text: "Hello world",
+    html: "<b>Sending Emails with Node.js and Sendgrid</b>",
+  });
+
+  res.status(StatusCodes.OK).json({ info });
+};
+
+//alternate method to send JWT
+we can use cookies to send token
+
+const oneDay = 1000 * 60 * 60 * 24
+
+res.cookie(cookieName, cookieValue, {
+  httpOnly: true,
+  expires: new Date(Date.now() + oneDay)
+})
+
+it takes 3 arguments: cookieName, cookieValue, options
+
+//options
+domain:	String:	Domain name for the cookie. Defaults to the domain name of the app.
+encode:	Function:	A synchronous function used for cookie value encoding. Defaults to encodeURIComponent.
+expires:	Date:	Expiry date of the cookie in GMT. If not specified or set to 0, creates a session cookie.
+httpOnly:	Boolean:	Flags the cookie to be accessible only by the web server.
+maxAge:	Number:	Convenient option for setting the expiry time relative to the current time in milliseconds.
+path:	String:	Path for the cookie. Defaults to “/”.
+priority:	String:	Value of the “Priority” Set-Cookie attribute.
+secure:	Boolean:	Marks the cookie to be used with HTTPS only.
+signed:	Boolean:	Indicates if the cookie should be signed.
+sameSite:	Boolean or String:	Value of the “SameSite” Set-Cookie attribute. More information at https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00#section-4.1.1.
+
+//parsing cookies on server
+we don't have access to cookies by default on request. we can use cookie-parser package.
+
+const cookieParser = require('cookie-parser')
+
+//use it as a middleware
+app.use(cookieParser())
+
+every time the browser is gonna be sending the request with a cookie, we can access cookies with,
+req.cookies
+
+//signed and secure options in cookies
+secure: it restricts browsers to send cookies only over https
+signed: cookie will still be visible but with signature, it can detect if the client modifies the cookie
+
+res.cookie(cookieName, cookieValue, {
+  httpOnly: true,
+  expires: new Date(Date.now() + oneDay),
+  secure: process.env.NODE_ENV === 'production',
+  signed: true
+})
+
+if we enable the signed option, we need to pass signature in cookie parser middleware
+
+app.use(cookieParser(process.env.COOKIE_SIGNATURE))
+
+we cannot access signed cookies on req.cookies but req.signedCookies
+
+//logout functionality with cookies
+const removeCookies = ({ res }) => {
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+};
+
+//max size for cookie is 4096 bytes
+
+//crypto
+to create unique token we can use crypto library built into node js.
+
+const crypto = require('crypto')
+
+crypto.randomBytes(40)
+
+it will create a buffer with random bytes, to turn buffer into string we can use toString() method. by default the encoding will be utf8. it is more secure to use hex, where each byte is encoded into hexadecimal characters.
+
+crypto.randomBytes(40).toString('hex')
+
+//origin
+req.get('origin'): request origin url (http://localhost:3000)
+req.get('host'): localhost:3000
+req.protocol: http
+req.get('x-forwarded-host'): localhost:3000 //original without proxy
+req.get('x-forwarded-proto'): http
+
+//user agent
+req.headers['user-agent']
+
+//ip
+req.ip
+
+//create hash with crypto
+
+crypto.createHash('md5').update(string).digest('hex')

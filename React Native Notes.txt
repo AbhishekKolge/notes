@@ -1,0 +1,748 @@
+//React Native
+with help of react.js and react native we can build real world apps for android and ios platforms.
+
+react.js is a library independant from react native. it is a javascript library for building user interfaces. it is platform agnostic. it doesn't care about underlying platform. it just gives us tool for state management, building virtual component trees and then we need a library like react dom for translating the results react produce to an actual platform like browser.
+
+react.js in conjunction with react dom we can build web applications. (react dom adds web support)
+
+same way react.js in conjunction with react native we can build applications for android and ios.
+
+react native gives us a collection of special react components which we can use in JSX code, then these components are compiled to native ui elements for android and ios. it also exposes native platform apis like device camera, so we can use such features in javascript code.
+
+//react native under the hood
+web browser (react dom): <div></div>, <input/>
+native component (android): android.View, EditText
+native component (ios): UiView, UITextField
+react native JSX: <View></View>, <TextInput></TextInput>
+
+for ui: react native maps and compiles components to respective platform equivalents
+
+for logic: the logic which is written in javascript will run on a javascript thread hosted by react native in the app. logic does't get compiled.
+react native spins up a simple javascript process as part of native app and allows this process to talk to underlying native platform.
+
+//creating react native projects
+we have two options, expo cli (expo) and react native cli.
+if we use expo we can switch to react native cli anytime.
+
+expo cli (expo)
+1. third party service
+2. managed app development
+3. very convenient, less friction
+4. you can leave the expo ecosystem any time
+
+react native cli
+1. by the react native team and community
+2. bare bone development (you need to set up way more)
+3. less convenience features
+4. easier integration with native source code
+
+//expo cli (expo)
+we need to install expo cli globally:
+npm install -g expo-cli
+
+then create a project:
+expo init projectName
+it will give us options to choose template. (select blank template: a minimal app as clean as an empty canvas)
+
+//setting up workflow
+start development project with
+npm start or npm run start
+
+it will give us a qr code to scan.
+
+to view the application we need a application called expo go, then we scan the qr code with that app. after scanning we can view the app in device. we can also see logs in terminal.
+
+//react native components
+
+Basic Components:
+1. View : View is a container that supports layout with flexbox, style, some touch handling, and accessibility controls.
+2. Text : A React component for displaying text.
+3. Image : A React component for displaying different types of images
+4. TextInput : A foundational component for inputting text into the app via a keyboard
+5. ScollView : Component that wraps platform ScrollView while providing integration with touch locking "responder" system.
+6. StyleSheet : A StyleSheet is an abstraction similar to CSS StyleSheets
+////////////////////////////////////////////////////////////////////////////
+User Interface:
+1. Button : A basic button component that should render nicely on any platform
+2. Switch : Renders a boolean input.
+////////////////////////////////////////////////////////////////////////////
+List Views:
+1. FlatList : A performant interface for rendering basic, flat lists
+2. SectionList : A performant interface for rendering sectioned lists
+////////////////////////////////////////////////////////////////////////////
+Android Components and APIs:
+1. BackHandler : The Backhandler API detects hardware button presses for back navigation
+2. DrawerLayoutAndroid : React component that wraps the platform DrawerLayout (Android only).
+3. PermissionAndroid :  
+4. ToastAndroid : React Native's ToastAndroid API exposes the Android platform's ToastAndroid module as a JS module. It provides the method show(message, duration)
+////////////////////////////////////////////////////////////////////////////
+iOS Components and APIs:
+1. ActionSheetIOS : Displays native to iOS Action Sheet component.
+////////////////////////////////////////////////////////////////////////////
+Others:
+1. ActivityIndicator : Displays a circular loading indicator.
+2. Alert : Launches an alert dialog with the specified title and message.
+3. Animated : The Animated library is designed to make animations fluid, powerful, and painless to build and maintain.
+4. Dimensions : If you are targeting foldable devices or devices which can change the screen size or app window size
+5. KeyboardAvoidingView : It is a component to solve the common problem of views that need to move out of the way of the virtual keyboard. 
+6. Linking : Linking gives you a general interface to interact with both incoming and outgoing app links.
+7. Modal : The Modal component is a basic way to present content above an enclosing view.
+8. PixelRatio : PixelRatio gives you access to the device's pixel density and font scale.
+9. RefreshControl : This component is used inside a ScrollView or ListView to add pull to refresh functionality
+10. StatusBar : Component to control the app's status bar. The status bar is the zone, typically at the top of the screen, that displays the current time, Wi-Fi and cellular network information, battery level and/or other status icons.
+
+in react native the ui and custom components are the combination of core components and other built in components.
+
+we dont have css in react native. instead we have StyleSheet object or we can use inline styles.
+styling in react native is based on css syntax, but it is not css, just a subset of properties and features of css.
+
+//working with core Components
+if we want to use a component then we always need to import that component from react native.
+
+View component. it is similar to div from html. it is used as a box or container, to adjust positioning of child component. but view can't display text. it can only hold other components inside it.
+
+Text component. it is used to display text.
+
+Button. unlike html button, it is self closing element where we add title prop and we add any title there.
+
+//styling react native apps.
+we can add inline styling using style prop
+style={{margin: 10, borderWidth: 2, borderColor: 'red'}}
+
+or we can use StyleSheet object imported from react native (recommended)
+
+const styles = StyleSheet.create({
+    container: {
+        margin: 10,
+        borderWidth: 2,
+        borderColor: 'red'
+    }
+})
+
+we can also define styles without StyleSheet.
+
+const styles = {
+    container: {
+        margin: 10,
+        borderWidth: 2,
+        borderColor: 'red'
+    }
+}
+
+but StyleSheet gives autocompletion for better development and also provide validation. if we use invalid style properties or values, we will get an error or warning.
+
+different style properties need different kind of values.
+example,
+margin needs a number value (which will be translated to pixels and will automatically adjusted to device pixel density)
+borderColor need a string value (hex, shortcuts like red, blue, untility functions like rgb(), hsl(), rgba()')
+
+//layout and flexbox
+flexbox is a concept that applied to container elements to control how much space the container takes up and how the elements inside the container are positioned.
+
+every View component in react native uses flexbox by default to organize the childrens in column (top to bottom)
+
+exmaple:
+flex: 1,
+flexDirection: 'row' | 'column' | 'row-reverse' | 'column-reverse'
+justifyContent: 'space-between'
+alignItems: 'center'
+
+//handling events
+on TextInput we have onChangeText prop that will give us the entered text value
+on button we have onPress prop
+
+//styling differences
+styling in react native doesn't have cascading nature like css. styling on parent element doesn't get translate to child element.
+
+when we give styling to element, that element gets translate to underlying native element (ios and android). but that styling might not be supported for that underlying native element.in this case we can wrap that element with a such element that when gets translate to native element it supports that styling.
+
+exmaple:
+android native element of Text supports borderRadius.
+ios native element of Text doesn't support borderRadius.
+
+in this case we can wrap Text element with View element. because,
+android and ios native elements of View supports borderRadius.
+
+//making content scrollable with ScrollView
+we can wrap the content we want to scroll with ScollView.
+ScollView makes content inside it scrollable but the area that can be scrollable is determined by the parent element that holds the ScrollView.
+
+//optimizing lists with FlatList
+ScollView has one downside. it renders all the content inside it when overall ui is rendered, even if the item is not currently on the screen it still renders behind the scene.
+this behavior is not a problem for content like an article or limited content. but if we have large data like dynamic list which can be large in numbers, it is not optimized way to use ScollView. because all that list items will be rendered even if it is not on screen which can lead to performance issues.
+
+in such situation we can use FlatList.
+FlatList is specifically built for scrollable lists. internally it will only render the items that are visible on screen. all the other items that are offscreen will only be rendered lazly as user scrolls. it will have a small threshold to make sure it will start loading and rendering items before they are visible as user scolls to them.
+
+FlatList has data props where we pass the data array we want to render.
+
+in renderItem prop we pass a function that gets single dataItem as a default parameter and return JSX code that should be rendered for every dataItem. the dataItem that we get as default parameter is an object which gets wrapped around every data in data array internally. it has index property which holds index of an every data and item property which holds actual data.
+
+we also have numColumns prop where we pass a number.(default is 1). it will render the items in FlatList in columns format.
+
+when using FlatList there are two main ways to add keys.
+
+1. add key property to every data in data array. this key property will automatically used as a key for every item that is rendered.
+
+2. if we can't add key to every data because it might be coming from an api and we don't want to transform it just for using FlatList. we can add keyExtractor prop on FlatList where we pass function that gets item and index as default parameter and return a key. (return index or return item.id, where id is unique and part of data that is coming from an api)
+
+//handling taps with pressable component
+to make element pressable we wrap that element with Pressable element.
+on Pressable element we get onPress props where we can pass function with logic. onPress props will trigger this function whenever we tap or press any item inside Pressable.
+
+//ripple effect
+for android to get ripple effect we have android_ripple prop on Pressable element.
+it takes an object where we define the color property for ripple.
+android_ripple={{color: '#fff'}}
+
+for ios we we can pass function to style prop on Pressable. it gets pressed state as default parameter. depending on pressed state we can return different style objects.
+
+style={(pressData) => {
+    return pressData.pressed && styles.someStyle
+}}
+
+we can return multiple style object with the help of array.
+style={(pressData) => {
+    return pressData.pressed ? [styles.someStyle, styles.someStyle2] : styles.someStyle
+}}
+
+//Modal
+to add modal we can use Modal component imported from react native.
+we wrap the content we want to show as a modal with Modal component.
+Modal component has visible prop where we can pass true for visible and false for hide.
+it has another prop called animationType which can have none, fade or slide value.
+
+//Image
+we can show images with Image component imported from react.
+Image component has source prop where we can pass imported image from assets.
+
+import someImage from './path'
+<Image source={someImage} />
+
+or
+
+<Image source={require('./path')} />
+
+if we want to set source to url instead of using local image, then we can pass object to source prop with uri property set to image url.
+(when we use image from the web using url, width and height should be specified because default width and height won't be set.)
+
+//common background color for all screens
+if we have multiple screens and all screens have same background color, it is not good practice to manually set background color for every screen. instead when using expo, in app.json file we can add backgroundColor configuration,
+"backgroundColor": "someColor"
+this backgroundColor will get automatically applied to all screens (all main screens, not modal or overlays) by expo.
+
+//StatusBar
+StatusBar is the component we can use to finetune the status bar.
+
+we can import StatusBar from 'expo-status-bar'
+expo-status-bar is a standalone package which is already a part of expo.
+
+we use this component in JSX in root app component.
+it has style prop where we can pass auto, dark, light or inverted as value.
+
+//debugging
+we can open menu in expo by typing 'm' command in terminal
+select debug remote JS option, it will open new tab in chrome where we can open chrome developer tool to see network request made by app and logs we write inside app.
+
+we can also use react developer tools,
+install react developer tools globally or specifically for project.
+npm install -g react-devtools
+
+then run,
+react-devtools
+
+or
+
+run,
+npx react-devtools
+
+it will open new react devtools window. but to use it we need to enable debug remote JS option.
+
+//adding shadows
+for android,
+we can add elevation property to styling. it takes number as value which represents level of elevation. higher the number more shadow will be added.
+
+for ios,
+we have shadow properties. (add background color to have shadow to take effect. if overflow hidden is applied then shadow won't be seen. hence apply overflow hidden to android only using platform api or manage View structure accordingly.)
+
+shadowColor, shadowOffset, shadowOpacity and shadowRadius.
+shadowColor takes color as value.
+shadowOffset takes an object with width and height property and number as value of those properties.
+shadowRadius represents how much shadow should expand. it takes number as a value.
+shadowOpacity takes number between 0 to 1 as value.
+
+//TextInput props
+TextInput has lot of useful props. we can check official documentation for that.
+example,
+maxLength={3}
+keyboardType='number-pad'
+autoCapitalize='none'
+autoCorrect={false}
+
+//linear gradient
+we can use expo-linear-gradient package to use linear gradient.
+expo install expo-linear-gradient.
+
+we can also use npm install expo-linear-gradient
+
+but with expo install, expo will ensure that the fitting version is installed. it will take a look at the version of expo we are using and it will automatically install a dependency version that works well with the expo version.
+
+we get LinearGradient component from expo-linear-gradient
+
+we can use this component as required. it has colors prop which takes array of colors.
+
+<LinearGradient colors={['color1', 'color2']}>
+    <SomeComponent/>
+</LinearGradient>
+
+//background image
+we can use ImageBackground component from react native.
+
+it has a source prop where we pass imported image or directly import image inside it with require function.
+
+resizeMode which can be set to cover, contain, center etc.
+
+it has style and imageStyle props.
+(ImageBackground component is made up of View and Image components behind the scene.)
+
+hence style object we pass to style and imageStyle props is applied for View and Image component respectively.
+
+example,
+to set opacity of ImageBackground, we pass that style to imageStyle prop.
+
+//alert
+react native gives us Alert api which we can use to show alerts.
+it is an object. to show alert we can use alert method on that object.
+
+(it also has prompt method which would display a dialog where we can enter a value.)
+
+alert method takes few arguments,
+title
+message
+array of buttons that will be part of alert. every button will be an object that can have text, style and onPress properties.
+
+this alert method will create native alert dialog for ios and android.
+
+Alert.alert('title', 'some message for alert', [{text: 'buttonText', style: 'cancel or default or destructive', onPress: someFunction}])
+
+//SafeAreaView
+it is a component imported from react native.
+
+it is used to prevent content from going under notch.
+it adds appropriate spacing around content to allow for notch and status bar.
+
+//storing colors
+we can store colors in different file and use it wherever required, so if we change color or its shade it automatically gets applied to all places.
+
+create constants folder. in there create colors.js
+( example:
+
+    const Colors = {
+        primary500: '',
+        primary600: '',
+        primary700: '',
+        accent500: '',
+        accent600: '',
+    }
+)
+
+//icons
+we can use @expo/vector-icons package which comes with expo. it is peer dependency of expo.
+it has many icon sets that we can use.
+example,
+Ionicons
+
+import {Ionicons} from '@expo/vector-icons'
+
+it is a self closing component. it has,
+name prop where we pass icon name.
+size prop where we pass number as a value to set size of icon.
+color prop where we pass color as a value.
+
+//custom fonts
+we should set up custom fonts in root component so they are loaded right when the app starts.
+
+we can install expo-font package
+expo install expo-font
+
+we get useFonts hook from expo-font
+import {useFonts} from 'expo-font'
+
+we use this hook in app component.
+
+in that hook we pass object with instruction about which font should be loaded.
+
+in that object we must set up property names that will later be used to identify the fonts we loaded. values of these property names that points to those files that should be loaded.
+
+exmaple,
+useFonts({
+    'open-sans': require('./path/OpenSans-Regular.ttf')
+    'open-sans-bold': require('./path/OpenSans-Bold.ttf')
+})
+
+useFonts returns an array,
+fontsLoaded (boolean)
+
+const [fontsLoaded] = useFonts({...})
+
+to use custom fonts, in StyleSheet we add fontFamily with value of identifires we used for fonts.
+
+fontFamily: 'open-sans'
+fontFamily: 'open-sans-bold'
+
+//splash screen (app loading screen)
+we can install expo-app-loading package.
+expo install expo-app-loading
+
+we get AppLoading component from this package.
+
+example,
+
+import AppLoading from 'expo-app-loading'
+
+<AppLoading/>
+
+//using and styling nested Text element
+
+Text can have another Text inside it.
+
+<Text>Some random text is <Text>written</Text> here.</Text>
+
+//building adaptive user interfaces
+
+we can set maxWidth, minWidth along with width property for dynamic width.
+
+we also get Dimensions api from react native. it is an object. it has get method which takes an argument which is a string. screen or window. for ios it doesn't make difference. for android screen means entire available width and height including status bar and window means excluding the status bar (actual part of the screen where ui is painted and usable)
+
+it also returns an object on which we can access various properties.
+like,
+fontScale: to find out which kind of scaling user wants and we can multiply our font sizes by that value.
+width
+height
+
+const deviceWidth = Dimensions.get('window').width
+
+with help of this value we can set styling in StyleSheet.
+1. use it in mathematical calculations. (padding: deviceWidth / 20)
+2. use it in if conditions or ternary operators. (padding: deviceWidth < 380 ? 18 : 26)
+
+//unlocking orientation
+in expo we have app.json file.
+in that file we can set orientation property to portrait, landscape or default. default will unlock both orientations.
+
+//setting sizes dynamically for different orientations.
+when we set sizes with Dimensions api it gets locked. means if device size changes because of orientation sizes doesn't change. because we are setting it outside the component function.
+
+to set dynamic sizes we can use useWindowDimensions hook from react-native.
+we use it inside of component function.
+when we call that hook we get an object, with help of object destructuring we get width and height of the device.
+
+const {width, height} = useWindowDimensions()
+
+internally this hook will watch the device dimensions and when they change, like because of orientation change, the component function will get executed again and we get updated width and height.
+
+we can derive our sizes based on this dynamic values.
+example,
+const marginTopDistance = height < 380 ? 12 : 24
+
+then use this property in style prop of JSX code.
+exmaple,
+<View style={[styles.someStyle, {marginTop: marginTopDistance}]}>something</View>
+
+//KeyboardAvoidingView
+we get KeyboardAvoidingView component from react native
+we can wrap content that contains an input field with KeyboardAvoidingView.
+
+so when keyboard opens up the content that holds input will move up.
+
+with wrapping the content with KeyboardAvoidingView, we need to configure it as well.
+we can add behavior prop that takes string as value. which can be set to height, padding or position. (position work well)
+
+but to move the content effectively we should wrap it with ScollView.
+
+example,
+
+<ScollView>
+    <KeyboardAvoidingView behavior='position'>
+        <View>
+            <TextInput/>
+        </View>
+    </KeyboardAvoidingView>
+</ScollView>
+
+//different layout for different screen sizes
+with the help of useWindowDimensions hook we can return different layout (JSX code) depending on width and height.
+
+//platform specific code with Platform API
+we can use Platform api from react native
+
+we can set different styles depending on platform.
+1. with OS property,
+on Platform api we have OS property that is a string which can be android, ios, web, macos or windows
+
+marginTop: Platform.OS === 'android' ? 15 : 25
+
+2. with select method
+on Platform api we have select method which takes an object with ios properties and android property. select method returns value we set for different platforms.
+
+marginTop: Platform.select({ios: 25, android: 15})
+
+3. writing platform specific files
+name the files with .android.js and .ios.js at the end.
+while importing don't import with .android or .ios. because under the hood react native will pick the proper file based on the platform.
+
+(so we can write different code for different platform.)
+
+example,
+Component.android.js
+Component.ios.js
+
+import Component from './Component'
+
+//react navigation
+install @react-navigation/native
+
+and
+
+for expo,
+expo install react-native-screens react-native-safe-area-context
+
+now we get NavigationContainer component from @react-navigation/native
+
+we use this in root app component so entire app will be navigatable.
+we wrap our component with NavigationContainer.
+
+now we also need to install one of the supported navigators.
+Stack, Native Stack, Drawer, Bottom Tabs, Material Bottom Tabs, Material Top Tabs.
+these navigators implement different navigation behavior.
+
+to use native stack navigator,
+we install @react-navigation/native-stack
+
+with this installed, we have to create navigator and register the different screens that should be part of that navigator.
+
+for this to implement,
+we get createNativeStackNavigator function from @react-navigation/native-stack
+
+we can call this function outside the component to create a stack.
+const Stack = createNativeStackNavigator()
+
+Stack is an object with two properties. (Navigator, Screen)
+every property holds an object that acts as a component.
+
+we can use Stack.Navigator inside of NavigationContainer and Stack.Screen inside Stack.Navigator.
+
+Stack.Screen allows us to register a screen that will be managed by Stack.Navigator.
+we have name prop on Stack.Screen. this is a unique identifier that will be important to navigate between screens.
+we also have component prop that should be used for serving that screen. we add just a name of that component, not as JSX element.
+
+<NavigationContainer>
+    <Stack.Navigator>
+        <Stack.Screen name='SomeName' component={ComponentName}/>
+    </Stack.Navigator>
+</NavigationContainer>
+
+to navigate between screens,
+we get navigation prop on all the components which are used as a screen in navigation container.
+it is an object which has navigate method where we pass name of the screen to which we want to navigate.
+
+or
+
+we can use useNavigation hook from @react-navigation/native
+it gives us navigation object with navigate method.
+
+//default screen
+when app starts the top most screen (first child inside Stack.Navigator) is used as the initial screen.
+
+we can decide the default screen by reordering the screens.
+or
+we get initialRouteName prop on Stack.Navigator where we can pass name of the screen to show it as default screen when app starts.
+
+//using route parameter to pass data between screens.
+we can pass params using navigation object.
+on navigation.navigate method we pass name of the screen and it has one more optional parameter. it is an object where we can pass params.
+
+navigation.navigate('ScreenName', {
+    someId: Id
+})
+
+to extract this params on required screen we can use route prop which we get on components which are used as a screen.
+
+({navigation, route})
+
+now we can get that passed param object by accessing params on route object.
+
+const getId = route.params.someId
+
+or
+
+we can use useRoute hook imported from @react-navigation/native
+
+we get route object from useRoute hook and next is same as above.
+const route = useRoute()
+
+//replace current page with another page
+we have replace method on navigation object. it navigates to different screen but doesn't give us back button.
+
+navigation.replace('ScreenName')
+
+//navigation go back
+on navigation object we have another method called goBack(). using this method we can go back to the screen which opened current screen.
+
+//styling screen headers and background
+if we don't set the header title explicitly then name prop on the Stack.Screen will be set as header title.
+
+to set title of header on navigation we can pass options prop on Stack.Screen which takes object. where we can set lot of properties.
+1. we can set title
+2. headerStyle (for now it takes backgroundColor property only. it will change background color of navigation header)
+3. headerTintColor (the color we set here will be applied as title color, back button color and back button text color)
+4. contentStyle (we can set background color here for content on screen)
+
+if we want to set these styles to every screen then, instead of copy pasting these styles on options prop of every screen, we can set these styles on Stack.Navigator.
+to set these properties on Stack.Navigator, we have screenOptions prop.
+
+in that screenOptions prop we can pass object with style properties.
+we can also pass function that return this styles object. (if we use this we get default object parameter and on that object we can access navigation property which is same as prop on screen component and object we get from useNavigation hook.)
+
+if we set style properties on both Stack.Navigator and Stack.Screen and some properties clashed then, Stack.Screen properties will always win.
+
+//setting navigation options dynamically (like we we want to set navigation header title dynamically)
+
+in options prop we can pass function instead of object. in that function we get object parameter with route and navigation properties by default and we can set styling depending on route and navigation then we return object with options property.
+
+options={({route, navigation}) => {
+    const someId = route.params.someId
+    return {
+        title: someId
+    }
+}}
+
+or 
+
+we can set options dynamically inside screen component (prefer)
+
+the navigation object we get inside screen component or using useNavigation hook has another method called setOptions()
+there we can pass options object.
+
+const navigation = useNavigation()
+
+navigation.setOptions({
+    title: 'someTitle'
+})
+
+but setting options inside component is a side effect hence we should put it inside useLayoutEffect hook.
+
+we should not use useEffect.
+useEffect run after component is rendered. hence we could see delay while we see changed title when we set it using options inside component.
+
+useLayoutEffect will run before component is rendered or while component is rendering.
+
+//adding header button (button or any element)
+to add button on navigation header we can pass another property to options prop on Stack.Navigator and Stack.Screen. we can also add this property inside component using useNavigation hook.
+
+the properties we can set are headerRight or headerLeft property to component function.
+in that component function we get default parameter as object. on that object we get tintColor property that will be same as headerTintColor property if present.
+
+options={{
+    headerRight: ({tintColor}) => {
+        return <Button title='someTitle'/>
+    }
+}}
+
+we can set those properties to inline component function or define the component function in separate file and use that component here.
+
+//drawer navigation
+to use drawer navigation we need to install @react-navigation/drawer.
+
+we also need to install
+react-native-gesture-handler and react-native-reanimated
+
+because these packages are used by @react-navigation/drawer under the hood.
+
+all the steps are same as stack navigation,
+except we get createDrawerNavigator hook from @react-navigation/drawer
+
+and from that hook we get Drawer object to which we get Navigator and Screen properties.
+
+import {createDrawerNavigator} from '@react-navigation/drawer
+
+const Drawer = createDrawerNavigator()
+
+<NavigationContainer>
+    <Drawer.Navigator>
+        <Drawer.Screen name='screenName' component={SomeComponent} />
+    </Drawer.Navigator>
+</NavigationContainer>
+
+for customization we have headerStyle, headerTintColor, (sceneContainerStyle instead of contentStyle) same as stack. but we also have new options that can be set.
+1. drawerLabel: 'Some labelName' (option name inside drawer)
+2. drawerActiveBackgroundColor: 'someColor' (active option background color)
+3. drawerActiveTintColor: 'someColor' (active option text color)
+4. drawerStyle: {backgroundColor: 'someColor'} (background color of overall drawer)
+5. drawerContentStyle: {backgroundColor: 'someColor'} (background color of content inside drawer)
+6. drawerIcon: it takes a component function and in that function we get object with color (influenced by drawerActiveTintColor) and size as parameters. then we return JSX code or some icon (like Ionicons).
+
+({color, size}) => {
+    return <Ionicons color={color} size={size} name='someName' />
+}
+
+we can set a lot more properties that these. refer official documentation.
+
+we can also open and close drawer from another button.
+when using drawer navigation we get toggleDrawer method on navigation prop (or navigation from useNavigation hook)
+
+<Button title='Toggle Drawer' onPress={() => {
+    navigation.toggleDrawer()
+}}/>
+
+//bottom tabs
+@react-navigation/bottom-tabs
+
+all other steps are same
+
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
+
+const BottomTab = createBottomTabNavigator()
+
+<NavigationContainer>
+    <BottomTab.Navigator>
+        <BottomTab.Screen name='screeName' component={SomeComponent}/>
+    </BottomTab.Navigator>
+</NavigationContainer>
+
+we can add tab icon by passing tabBarIcon property in options object. it takes react component function and in that function we can return JSX code or icon (Ionicons).
+
+options={{
+    tabBarIcon: ({color, size}) => {
+        return <Ionicons name='someName' size={size} color={color} />
+    }
+}}
+
+other options properties:
+tabBarActiveTintColor: 'someColor' (it will set icon color when tab is active)
+
+we have more properties that can be set. (refer official documentation)
+
+//ActivityIndicator
+it gives us a platform adapting loading spinner.
+it has size props which takes large or small as a value.
+it also has color prop.
+
+//device storage
+we can use AsyncStorage. it is built into react native. but we should use community third party package.
+@react-native-async-storage/async-storage
+
+we import AsyncStorage from '@react-native-async-storage/async-storage'
+
+we can call setItem method on AsyncStorage. it will store new item into the storage.
+setItem takes two arguments.
+1. item key which can be used later to retrieve or delete that item.
+2. the item which we want to store. it should always be a string. if we have non string value like object or number we need to convert it to string. (using JSON.stringify())
+
+we can also get that item by key using getItem method on AsyncStorage.
+it takes item key as an argument.
+
+keep it in mind. getItem will return a promise.
+
+to remove item from device storage we have removeItem method on AsyncStorage.
+it takes item key as an argument.

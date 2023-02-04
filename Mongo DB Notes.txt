@@ -1,0 +1,472 @@
+no sql, non relational database
+store JSON
+easy to get started
+free cloud hosting - atlas
+
+unlike traditional database, in mongo db we can simply store everything in JSON.
+it doesn't care how data relates to each other.
+instead of tables we have collections which represents group of items.
+instead of rows we have documents which represents single item.
+a document is set of key value pairs.
+
+mongoose:
+it is an object data modeling library.
+writing mongo db validation, casting and business logic boilerplate is a drag.
+mongoose provides a straight forward, schema based solution to model your application data. it includes built in type casting, validation, query building, business logic hooks and more, out of the box.
+
+///////////////////////////////////////////////////////////////////////////
+//connection
+const mongoose = require('mongoose')
+
+const connectionString =
+  "mongodb+srv://<userName>:<password>@nodejsprojects.xsqqmvu.mongodb.net/<databaseName>?retryWrites=true&w=majority";
+
+if database is not created then it will be created automatically when we connect. if we don't mention the database name in mongo uri (connectionString) then default database with the name of 'test' will be created.
+
+mongoose.connect(connectionString).then(()=> {
+    console.log('connected to the db...')
+}).catch((err) => {
+    console.log(err)
+})
+
+//create documents and models
+we can set structure of documents using schema from mongoose
+
+const mongoose = require('mongoose')
+
+const SomeSchema = new mongoose.Schema({
+  name: String,
+  completed: Boolean
+})
+
+once we have structure for data, we can setup a model. models are representation of collection.
+in mongoose a model is a wrapper for schema. if schema defines a structure for document, model provides interface to the database. hence using the model we will be able to create, update, query and delete documents with ease.
+
+module.exports = mongoose.model('ModelName', SomeSchema)
+
+(whatever we setup in schema is gonna be passed on to the database and whatever comes as an extra is gonna be ignored)
+
+//SchemaTypes
+The following are all the valid SchemaTypes in Mongoose. Mongoose plugins can also add custom SchemaTypes like int32. Check out Mongoose's plugins search to find plugins.
+
+String
+Number
+Date
+Buffer
+Boolean
+Mixed
+ObjectId
+Array
+Decimal128
+Map
+Schema
+
+//validation
+in mongoose we can setup properties as objects and setup built in validators
+
+const SomeSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'name is required'],
+    trim: true,
+    maxLength: [20, 'name should be maximum 20 characters']
+  },
+  completed: {
+    type: Boolean,
+    default: false
+  },
+  email: {
+    type: String,
+    unique: true,
+    match: [regex, 'please provide valid email']
+  }
+})
+
+//type of array of string
+color: {
+  type: [String]
+}
+
+if we don't pass anything then by default it will set up as an empty array, even if required is true.
+
+//custom validators in mongoose
+const SomeSchema = new mongoose.Schema({
+  phone: {
+    type: String,
+    validate: {
+      validator: function(value) {
+          return /\d{3}-\d{3}-\d{4}/.test(value);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    },
+    required: [true, 'Please provide phone number']
+  }
+})
+
+//to make custom validation easy we can use validator package
+const validator = require('validator')
+
+const SomeSchema = new mongoose.Schema({
+  phone: {
+    type: String,
+    validate: {
+      validator: validator.isEmail,
+      message: props => `${props.value} is not a valid phone number!`
+    },
+    required: [true, 'Please provide phone number']
+  }
+})
+
+
+//match will create a validator that checks if the value matches the given regular expression
+//minlength and maxlength can be written in camel case (minLength and maxLength)
+
+//unique
+unique will create a unique index. it is not a validator
+
+//compound index
+SomeSchema.index({propertyOne: 1, propertyTwo:1}, {unique: true})
+
+//reference
+
+const SomeSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'name is required'],
+    trim: true,
+    maxLength: [20, 'name should be maximum 20 characters']
+  },
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+    ref: 'ModelName'
+  }
+})
+
+//timestamps
+
+when creating schema, after the schema object we can pass second argument for timestamp.
+
+const SomeSchema = new mongoose.Schema({
+  name: {
+      type: String,
+      required: [true, 'name is required'],
+      trim: true,
+      maxLength: [20, 'name should be maximum 20 characters']
+    }
+  },
+  {
+    timestamps: true
+  }
+)
+
+//query
+Mongoose models provide several static helper functions for CRUD operations. Each of these functions returns a mongoose Query object.
+
+Model.deleteMany()
+Model.deleteOne()
+Model.find()
+Model.findById()
+Model.findByIdAndDelete()
+Model.findByIdAndRemove()
+Model.findByIdAndUpdate()
+Model.findOne()
+Model.findOneAndDelete()
+Model.findOneAndRemove()
+Model.findOneAndReplace()
+Model.findOneAndUpdate()
+Model.replaceOne()
+Model.updateMany()
+Model.updateOne()
+
+A query also has a .then() function, and thus can be used as a promise.
+Mongoose queries are not promises. They have a .then() function for co and async/await as a convenience.
+
+//mongoose cast error
+if id has wrong syntax. (if we pass wrong amount of characters mongoose is looking for)
+
+const getTask = async (req, res) => {
+  try {
+    const { id: taskID } = req.params;
+
+    const task = await Task.findOne({ _id: taskID });
+
+    if (!task) {
+      //if we pass correct id syntax and can not find item
+      return res.status(404).json({ msg: `no task with id: ${taskID}` });
+    }
+
+    res.status(200).json({ task });
+  } catch (error) {
+    //if we pass wrong amount of characters or incorrect syntax in taskID
+    res.status(500).json({ msg: error });
+  }
+};
+
+//update options
+by default in return we get old value and validators don't run. Hence we need to pass options in update query.
+
+const someDocumentValues = await Model.findOneAndUpdate({ _id: someID }, req.body, {
+  new: true,
+  runValidators: true,
+});
+
+//PUT vs PATCH in mongoose
+by default update query in mongoose will update the properties we pass in and rest of existing properties will be the same.
+
+we can pass overwrite option in update query so mongoose will remove the existing properties if we don't pass those in update query. (we can use this behavior if we are using PUT method instead of PATCH method)
+
+const someDocumentValues = await Model.findOneAndUpdate({ _id: someID }, req.body, {
+  new: true,
+  runValidators: true,
+  overwrite: true
+});
+
+//enum in mongoose
+someName: {
+  type: String,
+  enum: ['first', 'second', 'third']
+}
+
+//custom error message if passed value does not match enum values
+//we can access passed value in message by using {VALUE}
+someName: {
+  type: String,
+  enum: {
+    values: ['first', 'second', 'third'],
+    message: '{VALUE} is not supported'
+  }
+}
+
+//find
+if we pass empty filter object ({}) in find method, we will get all the records.
+
+await Model.find({})
+
+if we want to get records with specific property value.
+(in mongoose version 6, if we pass a property in filter object that does not match with schema then mongoose will ignore that property)
+
+await Model.find({property: 'value'})
+
+//query operators
+https://www.mongodb.com/docs/manual/reference/operator/query/
+
+//regex
+await Model.find({
+  name: {$regex: 'value', $options: 'i'}
+})
+
+//sort
+await Model.find({}).sort('-propertyOne propertyTwo')
+(if we provide minus sign (-) in front of property then sorting will start in descending order (z to a))
+
+if we want conditional sorting we can't just chain method to returned result because when we await model, it will get us the result without query object and we can't chain method without query object, hence to chain conditional sort method we need to apply following functionality
+
+let result = Model.find({})
+
+if(sort) {
+  //multiple sort properties
+  const sortList = sort.split(',').join(' ')
+  result = result.sort(sortList)
+}
+
+const data = await result
+
+//select
+with select method result includes only properties which we pass in select method
+
+.select('propertyOne propertyTwo')
+
+from above example we will get id (default), propertyOne and propertyTwo in result
+
+//limit
+.limit(10)
+it will limit the response to maximum 10 records
+
+//skip
+.skip(5)
+it will skip first 5 records in the response
+
+
+//pagination using skip and limit method
+const page = 1
+const limit = 10
+const skip = (page - 1) * limit
+
+const result = await Model.find({}).skip(skip).limit(limit)
+
+//numeric filters
+$gt
+$gte
+$lt
+$lte
+$eq
+
+await Model.find({property: {$gt: 10}})
+
+//count
+await Model.countDocuments({})
+
+//middleware
+middleware also called pre and post hooks. these are functions which are passed control during execution of asynchronous functions. middleware is specified on the schema level and is useful for writing plugins.
+
+//pre
+//validate and save will run before post and patch
+SomeSchema.pre('validate',async function() {
+  const value = this.modelProperty
+  await someFnc(value)
+})
+
+SomeSchema.pre('save',async function() {
+  const value = this.modelProperty
+  await someFnc(value)
+})
+
+prefer 'validate' because 'validate' runs before 'save'.
+
+//this will run before delete
+SomeSchema.pre('remove',async function() {
+  await this.model('ModelName').deleteMany({property: this._id})
+})
+
+//we can check modified property in hooks using,
+this.modifiedPaths(): it will return array of modified properties
+this.isModified('property'): we can check for specific properties if modified or not, it will return true or false
+
+we should not use arrow function instead use function keyword syntax, so 'this' keyword will be scoped to document
+
+when we update model using save() method instead of findByIdAndUpdate or findOneAndUpdate, we trigger hooks (pre and post)
+
+//schema instance method
+every document we create, we can have functions on them.
+
+SomeSchema.methods.someFunction = function() {
+  return this.modelProperty
+}
+
+SomeModelInstance.someFunction()
+
+//static method on schema
+rather than calling it on instance of schema, we can call it on schema itself
+
+SomeSchema.statics.someFunction = async function(id) {
+  //some calculation
+}
+
+//in order to call this static method, we can use hooks
+SomeSchema.pre('save',async function() {
+  await this.constructor.someFunction(this.someForeignPropertyId)
+})
+
+SomeSchema.pre('remove',async function() {
+  await this.constructor.someFunction(this.someForeignPropertyId)
+})
+
+//handle custom errors and mongoose errors
+
+//custom error
+let customError = {
+  msg: err.message || "Something went wrong, please try again",
+  statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+};
+
+//mongoose validation error
+if (err.name === "ValidationError") {
+  customError.msg = Object.values(err.errors)
+    .map((item) => item.message)
+    .join(",");
+  customError.statusCode = StatusCodes.BAD_REQUEST;
+}
+
+//mongoose duplicate error
+if (err.code && err.code === 11000) {
+  customError.msg = `Duplicate value entered for ${Object.keys(
+    err.keyValue
+  )} field, please choose another value`;
+  customError.statusCode = StatusCodes.BAD_REQUEST;
+}
+
+//mongoose cast error
+if (err.name === "CastError") {
+  customError.msg = `No item found with id of ${err.value}`;
+  customError.statusCode = StatusCodes.NOT_FOUND;
+}
+
+res.status(customError.statusCode).json({ msg: customError.msg });
+
+//mongodb aggregation pipeline
+An aggregation pipeline consists of one or more stages that process documents:
+
+Each stage performs an operation on the input documents. For example, a stage can filter documents, group documents, and calculate values.
+
+The documents that are output from a stage are passed to the next stage.
+
+An aggregation pipeline can return results for groups of documents. For example, return the total, average, maximum, and minimum values.
+
+example:
+
+let stats = await Job.aggregate([
+  { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+  { $group: { _id: "$status", count: { $sum: 1 } } },
+]);
+
+let monthlyApplications = await Job.aggregate([
+  { $match: { createdBy: mongoose.Types.ObjectId(req.user.userId) } },
+  {
+    $group: {
+      _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+      count: { $sum: 1 },
+    },
+  },
+  { $sort: { "_id.year": 1, "_id.month": 1 } },
+  { $limit: 6 },
+]);
+
+//populate method
+it allows us to reference documents in other collections.
+
+inside of populate we can to pass two things.
+1. what we wanna reference
+2. what properties we wanna get (if we don't pass this specifically, then we get all the properties)
+
+const result = await ModelName.find({}).populate({
+  path: "referencePropertyName",
+  select: "property1 property2 property3",
+});
+
+//virtuals
+these are properties that do not persists or stored in a database, they only exists logically. we create them on a fly when we wanna compute something.
+
+i.e. one to many relationship. for reviews we reference product but for product we don't have reference property, instead we add some additional logic.
+
+to setup a model to accept virtuals, we pass toJSON:{virtuals: true} and toObject: {virtuals: true} in second argument object of creating new schema
+
+const SomeSchema = new mongoose.Schema(
+  {
+    property: {
+      type: String,
+      required: true
+    }
+  },
+  {
+    timestamps: true,
+    toJSON:{virtuals: true},
+    toObject: {virtuals: true}
+  }
+)
+
+after setting up model to accept virtuals, we need to create a virtual property.
+
+SomeSchema.virtual('propertyName', {
+  ref: 'ModelName',
+  localField: '_id',
+  foreignField: 'property',
+  justOne: false
+  match: {property: value} //optional filter
+})
+
+the drawback of virtual property is that we can not query it.
+
+//alternative approach to virtuals
+simply create new route that queries required document
+
+i.e. router.route('/:id/reviews').get(getSingleProductReviews)

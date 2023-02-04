@@ -1,0 +1,559 @@
+SQL (Structured Query Language)
+
+SQL is the language that is used for querying data. this data has clearly defined structure and that is split across different tables which might be related. with help of SQL we can also insert, update, delete and fetch + filter data. (CURD operations). we can define and create data tables with SQL and describe that table to clearly define which columns would go to the table with which kind of data can be stored in those columns.
+
+SQL is typically used for managing data in relational database management system (RDBMS).
+these are database systems that organize normalized data into multiple related tables where each table contains multiple fields (columns) for various records (rows).
+
+normalized data means single tables don't contain nested or compound data, instead data is split across multiple tables.
+
+in RDBMS and with SQL, data is commonly split across multiple tables which are related via record ids.
+
+sql is not limited to RDBMS. working with RDBMS is the most common use case, but sql is also very commonly used for data analytics on data stored in various formats. (i.e. without a database)
+
+when we use software (RDBMS) we get database server (cluster) which can have one or multiple database. data in those database can be related but often it won't.
+
+these database can have multiple tables which also can be related.
+
+in these tables we have columns and rows which make up the table. it is an actual data.
+
+sql is the language to interact, manipulate, setup database and its table, query, filter, structure and merge the data.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//connecting to database server using shell or workbench
+
+//mysql shell
+shell.connect() command will connect to mysql server. it takes few arguments that should be passed in {}.
+host key, username, password and port (if we want to change default port)
+
+shell.connect({host: 'localhost', user: 'root', password: 'Akolge96@#0501', port: 3306})
+
+then we need to switch language to SQL, by \sql command
+after that we can run sql commands
+
+//postgresql shell (SQL Shell psql)
+
+//vs code (preferred)
+we need to install extension called SQLTools. it will help to turn vs code into the client that will be able to connect to sql databases.
+then to add new connection we need to install drivers. SQLTools MySQL/MariaDB and SQLTools PostgreSQL/Redshift Driver.
+
+in mysql to connect database from vs code we need to disable strong authentication method. (we should enable it when we host database to real server. but for local development we can disable it.)
+
+to disable strong authentication method we can execute a query.
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'somePassword'
+
+(root is username and localhost is server address)
+
+this sql command will change database server setting such that the 'root' user can be logged in with weaker authentication method. During development, this is absolutely fine.
+
+///////////////////////////////////////////////////////////////////////////////////
+//managing tables and working with data types
+
+in mysql schema means database, but for postgresql and some other databases schema means a way of organizing tables so we can ground together tables with schema and then they can share some functionality and we can have multiple tables with same name if they are in different schemas.
+
+///////////////////////////////////////////////////////////////////////////////////
+When working with SQL, there are various numeric data types that can be used when defining tables and the column data types.
+
+The exact data types (and their names, keywords) depend on the underlying RDBMS / environment that's being used. Hence the official docs are always a great place to go.
+
+MySQL Data Types Documentation: https://dev.mysql.com/doc/refman/8.0/en/data-types.html
+
+Postgresql Data Types Documentation: https://www.postgresql.org/docs/current/datatype.html
+
+When it comes to numeric data types, the amount of available data types can be confusing. Besides the differentiation between integers ("whole numbers") and approximated + exact numbers with decimal places, there also are differences within these main groups to allow for different value ranges (e.g. integers between -128 and 127 vs integers between way larger max and min numbers).
+
+Those "size categories" exist because different value types occupy different amounts of storage (and memory) space and can affect performance. So choosing the proper category can be important to optimize the disk storage and memory usage (as well as performance).
+
+Below, you find an overview of all the numeric value types as well as links to the official docs that summarize the available numeric value types as well as their value ranges:
+
+MySQL
+Supported integer data types:
+
+INT (or INTEGER)
+
+TINYINT
+
+SMALLINT
+
+MEDIUMINT
+
+BIGINT
+
+For a comparison (e.g. min / max values), see this table in the official docs: https://dev.mysql.com/doc/refman/8.0/en/integer-types.html
+
+Supported fixed point data types (exact numbers with decimal values):
+
+DECIMAL
+
+NUMERIC
+
+For MySQL, these two value types are equal.
+
+Official docs on NUMERIC / DECIMAL: https://dev.mysql.com/doc/refman/8.0/en/fixed-point-types.html
+
+Supported floating point data types (approximate numbers with decimal values):
+
+FLOAT
+
+DOUBLE
+
+DOUBLE offers twice the precision (i.e. the number of digits that are stored approximately after the decimal point) than FLOAT.
+
+For more details, see the official docs: https://dev.mysql.com/doc/refman/8.0/en/floating-point-types.html
+
+Postgresql
+An overview of ALL numeric values can be found here: https://www.postgresql.org/docs/current/datatype-numeric.html
+
+Supported integer data types:
+
+INT (or INTEGER)
+
+SMALLINT
+
+BIGINT
+
+Supported fixed point data types (exact numbers with decimal values):
+
+DECIMAL
+
+NUMERIC
+
+For Postgresql, these two value types are equal (just as for MySQL).
+
+Official docs on NUMERIC / DECIMAL: https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL
+
+Supported floating point data types (approximate numbers with decimal values):
+
+REAL
+
+DOUBLE PRECISION
+
+FLOAT (the same as REAL)
+
+DOUBLE PRECISION offers twice the precision (i.e. the number of digits that are stored approximately after the decimal point) than REAL.
+
+For more details, see the official docs: https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-FLOAT
+
+////////////////////////////////////////////////////////////////////////////////////////////
+//Date (TIMESTAMP)
+
+When working with data types that include a time (like TIMESTAMP), the time of course is meaningless unless it's also combined with information about the timezone to which it belongs.
+
+Many SQL database systems, including MySQL & Postgresql, store times in UTC (i.e. using the UTC timezone) internally. Those database systems then automatically "translate" the time you provide or request from / to your local timezone.
+
+So if you insert a time like 16:32:00 and you're located in CEST (Central European Summer Time), then a value of 14:32:00 would be stored internally, as this is the UTC equivalent.
+
+If data is then fetched via SELECT, the time is returned in CEST again. Or, if it's requested from a client located in another timezone, it's returned translated to that timezone's time.
+
+//Date (DATE)
+it will store only date rather than timestamp.
+we can set DEFAULT to CURRENT_DATE which will pick up current date when the record is inserted.
+
+(date_created DATE DEFAULT CURRENT_DATE)
+
+in MySQL wrap CURRENT_DATE in ().
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//NULL
+
+Introducing NULL
+In the previous lecture, you learned about the special NULL value - which simply means that a record has no data for a specific column.
+
+As mentioned, NULL is not the same as 0 or 0.0 for numeric columns or '' (i.e. an empty string, empty text) for text columns. The latter examples (0, 0.0, '') are examples for values that are available - there is no missing data here. 0 is a valid number after all.
+
+How can you insert NULL as a value?
+You simply insert it by omitting a column (and its value) in the INSERT INTO statement.
+
+Here's an example:
+
+Assume that you have a table that was created like this:
+
+CREATE TABLE example (
+  full_name VARCHAR(200),
+  salary INT
+);
+Data could be inserted like this:
+
+INSERT INTO example (full_name, salary)
+VALUES ('Max Schwarz', 19000);
+In this case, no NULL data would end up in the inserted row as values are provided for all columns.
+
+Here's the same example without a salary:
+
+INSERT INTO example (full_name)
+VALUES ('Max Schwarz');
+Only the full_name column is referenced (and receives a value). salary is omitted - both in the column as well as in the VALUES list. In this case, no data would be written into the salary column for this inserted row - i.e. NULL would be the assumed value for salary for this record.
+
+If you would perform an operation like the below one, the NULL value would be ignored and would therefore not distort the overall result:
+
+SELECT AVG(salary) FROM example; -- The average would be calculated without taking the NULL values into account (i.e. NULL is NOT treated as 0!)
+NULL and DEFAULT Values
+If you have a table definition where some (or all) columns have default values (defined via DEFAULT), those columns can never store NULL as a value - even if no specific data is provided in the INSERT INTO statement. The reason for that is, that the DEFAULT value will be used if no specific data is provided.
+
+////////////////////////////////////////////////////////////////////////////////////////
+unique values and identifiers
+when storing data, each data entry should have at least one unique value (for identifying the record)
+
+1. choose and set IDs manually
+we can create a column in table and apply NOT NULL and UNIQUE constraints to it.
+unique constraint means this column must not contain duplicate values. (it will give us error otherwise)
+id INT NOT NULL UNIQUE
+
+2.generating auto incrementing integers is the solution which is offered by pretty much all sql database management systems.
+
+//MySQL
+id INT PRIMARY KEY AUTO_INCREMENT
+PRIMARY KEY is also a constraint. it is a combination of NOT NULL and unique. but we can have only one PRIMARY KEY per table.
+AUTO_INCREMENT is an attribute like DEFAULT. it ensures the database engine will store automatically incremented numbers in the column.
+
+//PostgreSQL
+AUTO_INCREMENT is not supported.
+id SERIAL PRIMARY KEY
+it doesn't use AUTO_INCREMENT attribute but instead a special SERIAL data type. under the hood it is just a INT which is configured to automatically increment when new row is inserted.
+
+(we can use SERIAL PRIMARY KEY syntax in MySQL also. but SERIAL will give us a BIGINT when used in MySQL.)
+
+////////////////////////////////////////////////////////////////////////////////////////////
+custom type
+like when creating ENUM in PostgreSQL.
+
+CREATE TYPE some_name AS ENUM('employed', 'self-employed', 'unemployed');
+
+custom types created via CREATE TYPE are actually stored in the database. so if we did create it before, we don't have to re-create it as long as we are using the same name for the custom type.
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+temporary tables
+
+CREATE TEMPORARY TABLE ...
+
+these tables are only stored temporarily in memory of database server. if we restart the server then those tables will be erased.
+
+////////////////////////////////////////////////////////////////////////////////////////////
+tables based on other tables or data
+
+CREATE TABLE USERS AS <query>
+
+creates a table and pre populates it with data from a query result set. it is useful if a subset of data from another table should be stored in a separate table.
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+Filtering
+
+=, IS
+check for equality. =  for most cases. IS for comparison to NULL and others.
+
+<>, !=, IS NOT
+check for inequality. != is an alias for <>. IS NOT for comparison to NULL and others.
+
+> / >=
+check for greater than / greater than or equal (for numbers or dates)
+
+< / <=
+check for smaller than / smaller than or equal (for numbers or dates)
+
+BETWEEN
+check for between values (both compare values are included in result)
+
+AND, OR
+combine multiple conditions
+
+(>,<,= etc. operators can not just be used on columns that store numbers but also on columns with text or dates/timestamps)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+data normalization, relationships and joining data
+
+//foreign key and related data
+data is connected across table via keys. the primary key of one table is used as a foreign key in other table. this is how we typically establish a connection in sql.
+every table must only have one primary key at most but may have multiple foreign keys or none.
+
+//data normalization: a concept that reduces data redundancy and increases data maintainability by splitting data across multiple tables and organizing tables according to data entities we are working with.
+
+goal is to split compound and grouped data into multiple standalone values.
+(full_name = first_name + last_name)
+
+splitting data entities across tables: we should split data into multiple tables to have one table per data entity.
+
+multiple rows with duplicate data in a single table should be avoided. having duplicate data in some columns in multiple rows is a clear indicator of suboptimal data normalization.
+
+coming up with related column names like address_street, address_num, address_city is another indicator or suboptimal normalization. (if column share same prefix then it should probably separate data entity.)
+
+avoid cud anomalies
+creation anomaly: inserting incomplete data
+update anomaly: many rows must be updated when a single entity changes
+deletion anomaly: deleting too much data
+
+normalization for humans:
+avoid mixing data entities in a same table.
+avoid multiple values in a single table cell.
+try to avoid splitting basic data across dozens of tables.
+
+(
+  one table = one data entity
+  one cell = one value
+
+  there might be more data entities than it might first look like.
+)
+
+///////////////////////////////////////////////////////////////////////////////////
+INNER JOIN (selects and gets us full matching data from multiple tables)
+to query related data and merged data from different tables into one result set, we can add INNER JOIN ON clause to SELECT statement.
+
+(
+  example:
+
+  SELECT u.first_name, a.street, a.house_number 
+  FROM users AS u
+  INNER JOIN addresses AS a ON u.address_id = a.id;
+)
+
+"ON" kind of tells SQL which columns hold the related data. because two rows that are stored in separate tables must have some common data in order to be related.
+
+SQL Dot Notation:
+<table name or alias>.<column name>
+used to clearly specify which column from which table should be accessed.
+(it is required because we can have same column names in different tables. there can be conflict when we are merging multiple tables with JOIN statement.)
+
+///////////////////////////////////////////////////////////////////////////////
+LEFT JOIN
+just as with INNER JOIN, LEFT JOIN does not just consider the left table (table we are selecting from) but actually the entire result set that was derived up to the LEFT JOIN clause and only the matching records from right table (after the LEFT JOIN).
+
+///////////////////////////////////////////////////////////////////////////////
+RIGHT JOIN
+just as with INNER JOIN, RIGHT JOIN does not just consider the right table but actually the entire result set that was derived after to the RIGHT JOIN clause and only the matching records from left table (before the RIGHT JOIN).
+
+///////////////////////////////////////////////////////////////////////////////////
+UNION (false friend)
+UNION is a clause that combines multiple result sets into one result set by appending rows.
+
+/////////////////////////////////////////////////////////////////////////////////////
+Foreign key constraint
+CREATE TABLE users (
+  first_name VARCHAR(200) NOT NULL,
+  last_name VARCHAR(200) NOT NULL,
+  address_id INT REFERENCES addresses (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+REFERENCES: defines the related table and column
+ON DELETE and ON UPDATE: defines the action that should be executed if a related row is deleted or updated.
+
+actions ON DELETE and ON UPDATE:
+//RESTRICT: prevent the intended action. (prevent deleting a related row.)
+//NO ACTION (default): prevent the intended action. (prevent deleting a related row.) check can be deferred. (as part of a transaction.)
+//CASCADE: perform the same action on the row with the foreign key.
+//SET NULL: set the foreign key value to NULL if the related row was deleted.
+//SET DEFAULT: set the foreign key value to its DEFAULT value if the related row was deleted.
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+Adding Foreign Key Constraints Via ALTER TABLE
+MySQL & Postgresql
+
+ALTER TABLE <table_name>
+ADD FOREIGN KEY (<column_name>) REFERENCES <related_table> (<related_column>) ON DELETE ... ON UPDATE...
+
+Removing Foreign Key Constraints Via ALTER TABLE
+MySQL & Postgresql
+
+ALTER TABLE <table_name>
+DROP FOREIGN KEY <constraint_name>;
+
+In order to DROP a foreign key constraint (just as for dropping any other kind of constraint), you need to assign a name to the constraint when adding it.
+
+This can be done like this:
+
+Adding with constraint name via CREATE TABLE:
+
+CREATE TABLE <table_name> (
+    <column_name> <column_data_type>,
+    CONSTRAINT <constraint_name> FOREIGN KEY (<column_name>) REFERENCES <related_table> (<related_column>) ON DELETE ... ON UPDATE...
+);
+
+The FOREIGN KEY part (i.e. FOREIGN KEY <constraint_name>) is only required if a name should be assigned. If you don't need a name (because you don't plan on dropping the constraint at any time), you can omit FOREIGN KEY - just as we did in the lectures.
+
+There also are ways of dropping constraints without names but it's a bit more complicated - see: https://stackoverflow.com/questions/1430456/how-to-drop-sql-default-constraint-without-knowing-its-name
+
+Adding with constraint name via ALTER TABLE:
+
+ALTER TABLE <table_name>
+ADD CONSTRAINT <constraint_name> FOREIGN KEY (<column_name>) REFERENCES <related_table> (<related_column>) ON DELETE ... ON UPDATE...
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+different kinds of data relationships
+//one-to-many (1:n)
+one record in table A has one or many related records in table B.
+example: an employee belongs to one company but a company has many employees.
+
+//many-to-many (n:n)
+one record in table A has one or many related records in table B and vice versa.
+example: an employee is part of multiple projects and every project has multiple employees assigned to it.
+(we need to create intermediate table that is used to store the relations between two tables. in that table we will have one row per relation between the two main tables.)
+
+//one-to-one (1:1)
+one record in table A belongs to exactly one record in table B and vice versa.
+example: an employee has exactly one intranet account and every intranet account belongs to exactly one employee.
+(we can set relationship column in either of the two tables.)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+You learned that most tables should have a PRIMARY KEY and that often, an auto-incrementing ID will be used as a primary key. But you also learned that this is not a must-do - you can use any column as a primary key!
+
+But when should you use which column? When should you use a user's email as a primary key, instead of an "artificially added" id column?
+
+There are couple of thoughts I want to share about this important question:
+
+You can always use an auto-incrementing id column if you want to or if you didn't find a better "real identification criteria" for a given table and its records
+
+You could consider using another column (e.g. an email) if that is the "real identification criteria" of the table's records (for example, you could argue that users are indeed uniquely identified via their email addresses - hence you could use the email column as a PRIMARY KEY column)
+
+You might still want to add and use an "artificial primary key" (a so-called surrogate key) for various reasons:
+
+Maybe despite being identified uniquely via email addresses, you want to also have unique IDs for users (e.g. so that you have a simpler and shorter unique value per user)
+
+Some potential "real keys" might take up lots of memory and could therefore even slow down queries => Auto-incrementing ids might be more efficient to use for frequent queries (especially when also working with lots of complex relationships)
+
+Some columns might look unique at first - but aren't if you think about them again (e.g. the "street" of an address might be unique - but only per city; the same street could be part of multiple cities or even countries)
+
+Ultimately, it will always come down to a variety of factors: The exact use-case you have, experience, personal preferences etc. You should be open to look for "real keys" instead of always automatically using auto-incrementing IDs but you probably also shouldn't force it.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+composite primary keys
+primary keys don't have to be auto incrementing integers.
+we must only have one primary key per table and primary keys can span multiple columns.
+
+auto incrementing integers (that are primary keys) are surrogate keys. it acts as a unique primary identifier but it is not the real unique identification criteria.
+
+we can also use a column or combination of columns as a primary key, it will be real key.
+to use a column or combination of columns as primary key, we can define composite primary key.
+
+--one column
+CREATE TABLE employee (
+  email VARCHAR(150) NOT NULL,
+  password VARCHAR(200) NOT NULL,
+  PRIMARY KEY (email) --composite primary key
+);
+
+or
+
+CREATE TABLE employee (
+  email VARCHAR(150) NOT NULL PRIMARY KEY,
+  password VARCHAR(200) NOT NULL,
+);
+
+--combination of columns
+CREATE TABLE projects_employees (
+  employee_id INT,
+  project_id INT,
+  PRIMARY KEY (employee_id, project_id) --composite primary key
+);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+composite foreign keys (just an example)
+CREATE TABLE projects_employees (
+  employee_id INT,
+  project_id INT,
+  CONSTRAINT employee_project_foreign_key FOREIGN KEY (employee_id, project_id) REFERENCES employees (employee_id, project_id) ON DELETE CASCADE ON UPDATE CASCADE --composite foreign key
+);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+self referential or referencing relationships
+a data entity has a relationship to itself (i.e. internal relationship)
+//////////////////////////////////////////////////////////////////////////////////////////////////
+aggregate functions
+it is a mathematical  operation returning a single (aggregated) result. (reduce different values into single value)
+
+core aggregate functions:
+
+1. COUNT() count the records in individual column or entire table.
+2. SUM() sum of the values in the specific column.
+3. MAX() maximum value in the specific column.
+4. MIN() minimum value in the specific column.
+5. AVG() average value in the specific column.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+WHERE:
+filter is applied to raw data (before applying aggregate function)
+aggregate functions are not allowed as filter.
+
+HAVING:
+filter is applied after applying aggregate function.
+aggregate functions as filter are used.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+mathematical (arithmetic) operators : * , + , -, / etc.
+
+mathematical functions :
+1. CEIL: round up to next integer
+2. FLOOR: round down to previous integer
+3. ROUND:  round down to previous integer, but we can pass optional second argument as number to define decimal places with round off.
+4. TRUNCATE (mysql) TRUNC (postgresql): pass second argument as number to cut off decimal places without rounding off.
+
+string functions :
+1. CONCAT (mysql and postgresql) and || (postgresql): 
+CONCAT(first_name, ' ', last_name)
+first_name || ' ' || last_name
+
+2. UPPER
+UPPER('gayatri') => 'GAYATRI'
+
+3. LOWER
+LOWER('GAYATRI') => 'gayatri'
+
+4. LENGTH
+LENGTH('Gayatri') => 7
+
+5. TRIM : we need to pass 3 information to trim. first information as LEADING (beginning), TRAILING (end), BOTH. second information as what should be removed ' '. third information will be input with FROM keyword.
+TRIM(TRAILING ' ' FROM 'Gayatri          ') => 'Gayatri'
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Transactions:
+bundling multiple steps into a single operation.
+lets say we have 3 statements that contain dedicated queries and we only want to change database if all of the queries run successfully. transaction gives us full control of multiple statements which can become part of one single operation. we can bundle multiple statements in transaction block with help of transaction.
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+indexes:
+an index is a feature provided by database management system or any other tool that uses sql that enhances the performance of queries. indexes help us whenever we have where clause in query.
+
+(by default index table is created for primary key.)
+
+by default database management system has to go through all the rows of the table to find out which rows meet where clause condition. if we have a lot of rows then scanning all the rows for every query is super slow and inefficient. so here we can use indexes.
+
+we can assign index to any column of table. index will take all the values in that column and store it in separate index table. in addition the database management system keeps track of which index value belongs to which row in original table.
+
+(index list is sorted and optimized with additional other approaches.)
+
+if we run query then sql database management system will not scan original table but it will only look at relevant part of the index table and quickly finds connected rows in original table.
+
+we should not create indexes for all the columns in table because with too many indexes we get worse performance.
+whenever value changes the value has to be updated in both original and index table. it will be problematic when we have too many indexes and frequent value changes. if we have column which we use in some (few) where clauses or which gets updated frequently then adding index for such column will not be ideal.
+
+we should create index table for a column if it is used a lot in where clause and does not changes a lot (does not update often).
+
+type of technical implementation of indexes (how index works internally): 
+it uses different algorithms and support different comparison operation.
+
+1. B-Tree (default)
+2. Hash
+3. GiST
+4. SP-GiST
+5. GIN
+6. BRIN
+
+(refer docs)
+
+type of indexes we can configure (different functionality):
+it is used for different purposes and data values.
+
+1. standard single column index:
+2. unique index: it is same as standard single column index but in addition we get extra protection that insures that values can not be inserted more than once. (protection against duplicate values)
+3. multi column index (composite index): it groups multiple columns together. (useful when we have where clauses with multiple combined conditions.)
+4. partial index (not available for mysql): when we do not want to create index for all the rows in column but only for some rows.
+
+
+Besides creating indexes via CREATE INDEX, you can also add an index to a table right when creating that table - like this:
+
+CREATE TABLE <table_name> (
+    ... column definitions,
+    INDEX <index_name> (<column>)
+);
+
+Please note that this is supported when using MySQL but it won't work with Postgresql.
+
+You should always dive into the documentation of the database system you're using, to learn which features / syntax is available!

@@ -1,0 +1,1161 @@
+javascript tricks
+
+//if we set ? in front of object then it wont drill further if value before ? is undefined. it is useful when we want to access some property on object and sometimes object can be undefined.
+
+// to convert value into boolean we can add !! before value.
+
+// array.includes(value) to check if value is present in array.
+
+//copy array with slice method (arrayName.slice()) or using spread operator ([...arrayName]).
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Use className instead of class and htmlFor instead of for attribute.
+components return only 1 main div.
+
+If dont want root div in app.js. Replace div#root to React.Fragment tag or import Fragment and use only Fragment tag (<Fragment></Fragment>). (or can be empty tag.)
+
+//class components
+
+To use class components with method (function in class) render() {}. render() is lifecycle method. There are other lifecycle methods too.
+Then extend React.Component in class. (import Component and extend as Component)
+
+import React, { Component } from 'react';
+
+class App extends Component {
+  render() {
+    const name = 'Abhishek';
+    const loading = false;
+    return (
+      <div className='App'>
+        <h1>Hello {!loading && name}</h1>
+      </div>
+    );
+  }
+}
+
+<h1>Hello {!loading ? name : null}</h1> = <h1>Hello {!loading && name}</h1>
+if statements can be written in &&.
+if && then if first condition true and second true then shows second or second id false then shows nothing.
+
+if define above render() then it is method, then should use as this.variable. (for class components)
+
+custom components should be in components folder.
+custom components name should begin with uppercase letter.
+
+//props
+to access props in class components use this.props.name of prop
+
+props are properties that are pass to components from outside.
+
+//default props if props are not pass in
+static defaultProps = {
+    prop name: ...,
+    prop name: ...
+}
+
+default props are override by passing props
+
+//prop type check
+It is type checking like it tells that prop should be number, string, array or object etc.
+To uise proptype import PropTypes from "prop-types"
+
+use as
+static propTypes = {
+    prop name: PropTypes.string.isRequired,
+    prop name: PropTypes.number.isRequired
+}
+
+(it will show the warning in console if wrong type is pass in)
+
+//state
+state can be added using constuctor function 
+constuctor function runs when Component runs
+constuctor() {
+    super()
+    console.log('Hello')
+}
+
+Then define state as this.state in constuctor. (also other way we dont need to use that in constuctor you can directly define state = {})
+state is an object.
+
+this.state = {
+    property: property value
+}
+
+to grab something from state in a class component this.state.property
+
+to change state in class based component
+this.setState({property: value})
+
+//inline style in react pass in by attribute (use camel case property name and string as property value)
+style = {{ backgroundColor : 'red' }}
+or style = {style}
+const style = {
+    property: ...,
+    property: ...
+}
+
+(to avoid using this.state in everytime JSX we can use destructuring to get values we need from state)
+
+const { property, property } = this.state
+
+can use property instead of this.state.property
+
+//list and passing state with props
+
+each item in the list should have unique key attribute.
+
+//fuctional components are used for stateless components
+fuctional components doesn't need extends, render, this keyword for accessing props.
+props are access via function arguments.
+if there is no javascript above return then no curly brackets and return word with () required.
+default props and propTypes are put in below function. (use componentName. instead of static)
+can also use destructuring in prop arguments
+({user: {property, property}})
+({property, property})
+
+//updating states.
+//lifecycle method
+render()
+componentDidMount() (it runs when component mounts)
+
+//Environment variables (store global variables)
+create file in root folder .env.local (dont put this file in public repositary)
+create variable starts with REACT_APP_NAME
+after creating Environment variable we need to restart the server
+
+we can call that variable by process.env.REACT_APP_NAME
+
+//events and search
+in react when we have a form we can attach state to input by setting input value = {this.state.propertyName}
+onChange event should be put on input with method that changes state property value to input value
+(input value to this.state.propertyName)
+
+onSubmit event on form with method
+(use arrow functions)
+in normal function this keyword you need to bind ( .bind(this) ) to the function (method)
+generally use arrow function. Because in arrow function this keyword works differently.
+
+//React router
+npm i react-router-dom (install)
+
+import BrowserRouter, Switch, Route from react-router-dom
+(default import doesn't require curly braces on import. React router export lot of thigs that are not default so put imports in curly braces)
+
+in main app wrap everything from return statement in BrowserRouter tag.
+wrap all routes in a Switch tag and put Routes in there.
+(path '/' for home page. Create different paths for different pages. '/:id' where id is dynamic)
+(render={(props) => ()} for multiple component or passing props, states [when we need to pass states and props] || and component={component} for single component that doesn't require props or state [when we don't need to pass anything])
+Route exact path='/' render={props => (
+  <Fragment>
+  put here the components
+  </Fragment>
+)}
+
+(pass extra props in component by {...props} || and get [match] in component by this.props.match)
+/////(this.props.match.params)
+
+for pages create pages folder in component and put different page components there.
+for every component create new route
+<Route exact path='/componentName' component={component}
+
+//Links in router
+we don't use [a] tags for links because this is client side routing. means it doesn't send new request for new page.
+
+[a] tag changes state and Link tag doesn't.
+
+import Link from react-router-dom
+use Link tag instead of [a] tag and href is gonna get change to [to] attribute.
+[to] attribute will be path given to component in route.
+
+//Hooks and context
+context is used for state management.
+Hooks allow us to use functional components instead of class components. hooks are function that let us hook into react state and lifecycle methods from functional component.
+import { useState, useEffect } from 'react'
+
+useState let us use state
+useEffect memic lifecycle methods
+
+useContext and useReducer are used with context Api.
+useReducer dispatch actions to manipulate app level state and sends that states to component.
+
+useRef for form submission.
+
+//Hooks
+turn all class components to functional components.
+turn all methods in class to functions (const)
+
+use state in functional component
+
+import {useState} //(hook)
+define state
+const [stateName, setStateName] = useState('default value')
+
+to set state dont call this.setState()
+
+call
+setStateName(value we want to set)
+
+and dont write {this.state.name}
+just call {name}
+
+use lifecycle in functional component
+import {useEffect}
+useEffect(callback, [dependency])
+(dependency means condition (if something changes) when we want this to run)
+ (dont return directly without {})
+//useEffect(() => {
+  method1
+  method2
+  continue
+}, [])
+
+if without dependency then put [] and put comment under method
+// eslint-disable-next-line
+
+([] means when component mounts)
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+In JSX syntax we can run basic javascript expressions between {}.
+(like 1+1 and Math.random())
+
+we can store JSX content in variables.
+
+//children props, custom wrapper component
+custom components can not be wrapper. To make custom component as reusable wrapper...
+every component in react recieves a special prop which is built in react.
+put that prop between custom wrapper div tag.
+{props.children}
+children is reserved name.
+value of this props.children is always be the content between opening and closing custom component.
+
+to set className to custom component we need to add that className to string of class on that custom component.
+classes = "card " + props.className
+<div className={classes}>{props.children}</div>
+
+or
+
+<div className={`card ${props.className}`}>{props.children}</div>
+
+everything in className we recieve from outside is added to that class string.
+
+//Events
+events name starts with 'on'.
+const clickHandler = () => {
+    console.log('clicked')
+}
+onClick={clickHandler}
+
+dont call event with (). because with () event will fire with JSX code execution.
+(we just point to function)
+in function we get event argument as default.
+We should name event functions with 'Handler' at last name just to know that it is handled by some event.
+
+//component functions
+(component in react is just a function which returns JSX code.)
+
+at the time of painting browser with content, react goes through every component line by line and execute the JSX code until it ends. React does this only 1 time.
+Means it doesn't render new component value after 1st painting.We need something to tell react something is changed and react should reevalute specific component after changes. Thats why react introduced 'states'.
+
+//useState
+import {useState} from 'react'
+useState() is a react hook. It should be called in a custom component. (not outside component or nested inside a function in component.)
+useState() manages a variable. if that variable changes react will rerender that specific component instance in which that variable (state) is registered.
+useState() takes a default value. [useState(props.name)]
+useState returns array with two values. one is a value name (name) and second is a function (setName) to change value.
+value name should be descriptive.
+we can use array destructuring to get both values as const.
+const [name, setName] = useState(props.name)
+we can call setName to reassign value to that variable. [setName(reassign)]
+these special variables are called as states.
+
+//multiples state vs single state (should prefer multiple states)
+
+//multiple states
+const [enteredTitle, setEnteredTitle] = useState('');
+const [enteredAmount, setEnteredAmount] = useState('');
+const [enteredDate, setEnteredDate] = useState('');
+
+//single state
+const [userInput, setUserInput] = useState({
+    enteredTitle: '',
+    enteredAmount: '',
+    enteredDate: ''
+});
+
+but in multiple states you can't just set single value in object.
+because it will override original or previous state.
+setUserInput=({
+    enteredTitle: 'something'
+})
+
+thats why we should use spread operator to call all keys on object state and override keys we want to change.
+setUserInput({
+    ...userInput,
+    enteredTitle: 'something'
+})
+
+thats why we should prefer single state.
+
+like above if new state depends on previous state we should use arrow function.
+because react scheduls state updates hence if we called state updates multiple time there is possibility of new state depending on outdated state or incorrect state.
+
+hence use like this so react gives prevState snapshot is always lastest state snapshot.
+setUserInput((prevState) => {
+    return {...prevState, enteredTitle: 'something'}
+})
+
+prevState snapshot as argument is recieved automatically for state for which we are calling update function.
+
+//two way binding
+we get input value and set state value to input value but we also set input value to state value.
+so we can clear input values with clearing state values.
+(useful for form submission for clearing input values.)
+
+//parent to child component communication via props.
+//child to parent component communication via function props.
+if we want data from one component to other we pass it via common parent.
+
+//while passing function via props which take argument from component where that function executes, we should add .bind(null, argument)
+(onClick={function.bind(null, argument)})
+bind preconfigures the function for future execution.basically allows us to preconfigure the argument that function will recieve when it is begin executed. so we can ensure that function will recieve argument.
+
+//two types of components
+1. Controlled, Stateful, Smart
+2. Uncontrolled, Stateless, Dumb, Presentational
+
+//lists
+always add a key when maping out list of items. It helps react to identify the list item, where to put which item and update list in more efficient way.
+(we can use index as argument in map function but we should avoid it because it can still run into bugs.)
+hence add key prop in list.
+
+//We can return entirely different content with if statement. (only when return entire different content)
+
+means we can output conditional return statements.
+we can also output conditional content using variables. (we can store JSX content in variables.)
+
+//string to number
+add + sign before variable to covert string to number
+
+/////////////styling react//////////////
+//dynamic inline styles
+set dynamic css styles using inline css in JSX with if conditions. (avoid using.)
+
+//dynamic styles using class
+add or remove classes using ternary operator in className
+
+//styles using styled components
+create components using
+
+const FormControl = styled.element`
+all the styles and other elements inside it using & psuedo selector like sass.
+`
+element can be any html element.
+
+props on styled components can be accessed between ``.
+and those props can be used to set dynamic styles using arrow function.
+this arrow function gets props as parameter and it returns the text we want to use as css style.
+
+//styles using css modules (best way)
+rename css file as name.module.css (it is necessary for modules to work behind scenes)
+import css file as import styles from 'name.module.css'
+(style is an object and all classes are properties on that object)
+
+apply class as styles.className
+(this creates classes as component_className__uniqueID)
+(if className is present with dash then apply class as styles['className-name'])
+
+const variable = {
+  abhishek: '25',
+  gayatri: '22'
+}
+
+console.log(variable.abhishek)
+console.log(variable['abhishek'])
+
+(like accessing properties on object via object.property or object['property'])
+
+//using local images in react.
+we can import images same as css modules.
+import abcImage from './abc.jpg'
+use in JSX as (<img src={abcImage} />)
+
+//Fragments, portals and refs
+we can return only 1 root element in react.
+it can be element, object or array etc.
+to return multiple element we need to wrap it in single wrapper div or any other semantic element.
+but it can cause unnessesary divs in our app. it can also break styling if we use nested css selectors.
+it also affect performance because react needs to render all those unnessesary divs and check those elements if content needs to change.
+
+to work around it we can return array of adjacent elements. but as we know we need to add key for each element if we return array. (dont use)
+we can use wrapping div but it creates unnessesary elements in dom as we know. (it is not ideal approch. avoid using it)
+we can also create a custom component which only returns props.children and use it as wrapper.(still avoid it because react gives us Fragments which works like this.)
+//
+we can use [React.Fragment] or using named import [Fragment] as a wrapper.
+new project setup in react also support empty element as wrapper. <> </>
+we can not write css for Fragment because it doesn't render in dom. it is just a invincible wrapper to fullfill react/javascript requirement of returning only thing.
+
+portals//
+as a example if we create a nested modal component in react. it will render in dom as a nested element. but as a semantic approch our modals or similar components like it should be independent and shouldn't be nested.thats where portals are useful.
+(portals help us to write component anywhere we want and render it somewhere else in real dom)
+portals need two things port where the component renders and portal.
+to create port we create new div with id="name-root".
+(react-dom brings react logic into browser to make react features compatible with dom.)
+to create portal we import ReactDom from react-dom.
+then to port component ReactDom.createPortal(<component />, document.getElementById('elementID'))
+elementID is the element we need to port. on <component /> we can pass props like we do.
+we can use portals anywhere we can use JSX.
+
+(use state when we want to read and manipulate value. Use refs when we only want to read value (except some edge cases like input element.))
+Introduction to refs hook
+refs help us to communicate to real dom element and read its property.
+(we can also set the element property using refs but try to avoid except some edge cases like reading input value and resetting input value.)
+we create refs by importing refs from react.
+const nameRef = useRef(). useRef takes default value we want to initialize with and returns a value (in this case nameRef) which allows us to work with that ref.
+and attach this nameRef to element we want to read.
+every element can be attach to refs. every element gets built in porp ref. we pass nameRef as a value.
+<element ref={nameRef} />.
+hence refValue is always is an object and it always returns current prop and current prop holds the value that ref connected with.
+nameRef = {
+  current: element
+}
+so we can read all the properties on that element using refs. 
+(like nameRef.current.value to get element.value)
+
+[
+  //////////////////////////
+  we can use one useRef for multiple element. (nameRef = useRef([]))
+
+  const addRef = (ref) => {
+    if(ref) {
+      nameRef.current.push(ref)
+    }
+  }
+
+  <element ref={addRef}/>
+ ///////////////////////////
+]
+
+Controlled vs Uncontrolled components
+this scenario is most of the time in context with form components. because form components like input have internal state by the browser which is take input by user, save it and reflect it.
+
+Controlled component: when we manage state and update it using useState to feed data into those internal state. (change internal state by react)
+Uncontrolled component: when we use refs to get element value but we dont feed data to internal state. instead we directly change the value (in case of resetting input value.)(change internal state manually)
+
+///////////
+useEffect hook (side effects)
+react renders the component and takes user input and interaction and based on it renders the component again. means whenever state changes.
+side effects are everything that should not run everytime the component renders like http requests or timeout etc.
+thats where we use useEffect hook
+useEffect hook takes two arguments a function which should run and dependencies on which it depends.
+means whenever dependencies change that function will run.
+(except first render it will not run whenever component renders (again).)
+(if we put empty array it will run at first render only. if we dont put array as second argument then it will run at every render cycle.)
+
+everything present in side effect function goes into dependencies. (we can ommit state updating functions (like setStateName) in dependencies array because react ensures that it will never change on its own across rerender cycles.)
+
+(use also whenever we want to observe and check data and set action response to that. (means set action in response to another action. this is also a side effect.))
+
+//useEffect cleanup function
+while sending http request or checking username on every input we might want to set time. means after every key press we want to wait for next key for specific time and if next key doesn't get press in that specific time we want to check or send http request.
+
+hence we should use timer but this timer will run after every useEffect function run. thats where we use cleanup function.
+cleanup function runs (before) every side effect function execution and when component unmounts. But doesn't run at first side effect function execution.
+//we use cleanup function inside side effect function as return statement.
+
+(as an example we can set timer in side effect function. but that time will run at every key press. to avoid it we use cleanup function as clearTimeout which run before every side effect function execution and clears timeout. Means resets it.)
+
+[
+  /////////////////////////////////////////////////////////////////////////////////////////
+In the previous lecture, we explored useEffect() dependencies.
+
+You learned, that you should add "everything" you use in the effect function as a dependency - i.e. all state variables and functions you use in there.
+
+That is correct, but there are a few exceptions you should be aware of:
+
+You DON'T need to add state updating functions (as we did in the last lecture with setFormIsValid): React guarantees that those functions never change, hence you don't need to add them as dependencies (you could though)
+
+You also DON'T need to add "built-in" APIs or functions like fetch(), localStorage etc (functions and features built-into the browser and hence available globally): These browser APIs / global functions are not related to the React component render cycle and they also never change
+
+You also DON'T need to add variables or functions you might've defined OUTSIDE of your components (e.g. if you create a new helper function in a separate file): Such functions or variables also are not created inside of a component function and hence changing them won't affect your components (components won't be re-evaluated if such variables or functions change and vice-versa)
+
+So long story short: You must add all "things" you use in your effect function if those "things" could change because your component (or some parent component) re-rendered. That's why variables or state defined in component functions, props or functions defined in component functions have to be added as dependencies!
+
+Here's a made-up dummy example to further clarify the above-mentioned scenarios:
+
+import { useEffect, useState } from 'react';
+
+let myTimer;
+
+const MyComponent = (props) => {
+  const [timerIsActive, setTimerIsActive] = useState(false);
+
+  const { timerDuration } = props; // using destructuring to pull out specific props values
+
+  useEffect(() => {
+    if (!timerIsActive) {
+      setTimerIsActive(true);
+      myTimer = setTimeout(() => {
+        setTimerIsActive(false);
+      }, timerDuration);
+    }
+  }, [timerIsActive, timerDuration]);
+};
+In this example:
+
+timerIsActive is added as a dependency because it's component state that may change when the component changes (e.g. because the state was updated)
+
+timerDuration is added as a dependency because it's a prop value of that component - so it may change if a parent component changes that value (causing this MyComponent component to re-render as well)
+
+setTimerIsActive is NOT added as a dependency because it's that exception: State updating functions could be added but don't have to be added since React guarantees that the functions themselves never change
+
+myTimer is NOT added as a dependency because it's not a component-internal variable (i.e. not some state or a prop value) - it's defined outside of the component and changing it (no matter where) wouldn't cause the component to be re-evaluated
+
+setTimeout is NOT added as a dependency because it's a built-in API (built-into the browser) - it's independent from React and your components, it doesn't change
+/////////////////////////////////////////////////////////////////////////////////////////////////
+]
+
+//useReducer
+useReducer is replacement for useState. it is more powerful but complex to use and requires extra setup.
+hence use useState for majority but sometimes it is worth to use useReducer. as example,
+when states are belong together or state updates which are depend on other states (where we can't use prevState function because they both are different states.).
+
+//while updating state array where we can't use prevState function use concat() method instead of push() method.
+concat method doesn't edit the exsisting array (means doesn't edit existing state array without react knowing it). instead it returns a new array.
+(useful when updating state array in reducer function.)
+
+useReducer returns array with two values. 
+1. state - latest state snapshot
+2. dispatch function - to update state snapshot. it will dispatch a action and that action will be consumed by first argument (reducer function) of useReducer.
+
+useReducer arguments
+1. reducer function - gets previous state snapshot automatically and action that was dispatched. it will return updated state.
+react will call this reducer function whenever new action is dispatched.
+2. initial state
+3. initial function - function to set initial state programmatically. like when inital state is more complex or it is a result of http request etc.
+
+reducer function can be defined as named function outside of component and pass a pointer at that function in useReducer.
+we can defined it outside of component because it doesn't need to interact with anything defined in component function. all the data it requires will be passed into the function when it is executed by react.
+
+dispatch function will be used for action. those actions will execute reducer function. and that reducer will return updated state. means whenever we want to update state we use dispatch function.
+we pass action in dispatch function. dispatchName(action).
+that action can be string, number. but often it will be an object. object will have field which holds indentifire. that indentifire field will be often type. indentifire will be a string (all capital letters). (type: 'USER_INPUT').
+(type field to describe what happened.)
+and a payload if we want to save something. (like val: e.taget.value)
+
+then reducer function will execute. we can return something depending on action by checking action.type and action.payloadFieldName.
+(using action.type is good practice)
+
+//context API
+create context, store or state folder in src folder. create name-context.js file in there.
+(we can create multiple context files for multiple states or single context file for all states.)
+
+import React from 'react'
+React.createContext({state})
+({state} could be string ('state'). but often it is an object ({ name: value }).)
+
+from React.context() we get back object which contains components. (like Provider and Consumer components etc.)
+
+const NameContext = React.createContext({state})
+export default NameContext
+
+now we need to provide and consume this context.
+
+to provide context we wrap the component which need that context with <NameContext.Provider></NameContext.Provider> component. the component we wrap and all the descendant of that component will have access to that context.
+
+to consume context data we have two ways. we can use hook (better way. using useContext hook) or NameContext.Consumer.
+(we consume where we need context data.)
+
+//using NameContext.Consumer
+we wrap everything with <NameContext.Consumer></NameContext.Consumer> where we want context data.
+NameContext.consumer takes a function as a child.
+that function will get ctx (context data) as an argument and returns code which should have access to that data.
+now we can access that data in that return code by ctx.dataName (for {name: value} we can access by ctx.name)
+
+(important thing!!!!!!!!!!!!!!!!
+default value of context data that doesn't change will only be used by consumer if we dont use Provider.)
+
+We pass value prop on Provider component. that value prop has same context data which we can change/manipulate. then new data will be passed down to consumer components. we can consume that data using NameContext.Consumer or useContext hook. (no need to pass data via props.)
+
+(we can also pass function to change or manipulate context data using value prop on Provider component.)
+
+(but keep in mind if we add new value or function on value prop then we should also add dummy value or function on default context data. (it helps with better IDE autocompletion))
+
+//using useContext hook
+we import useContext from react
+import NameContext
+
+we pass context into that hook and get ctx (context data) back.
+const ctx = useContext(NameContext)
+and we can access that data in code by ctx.dataName (for {name: value} we can access by ctx.name)
+
+//
+(one central context and one central state management)
+(better approach using custom context provider component so we can manage state in context component)
+create and export a new NameContextProvider component which returns <NameContext.Provider> {props.children} </NameContext.Provider>
+
+manage states and functions in that component(NameContextProvider).
+
+///Hooks rule.
+hooks can be only used inside react component functions and custom hooks.
+use hooks at only top level. dont use it inside nested function and block statements (like if statement).
+
+//React.forwardRef and useImperativeHandle hook (avoid this but useful in some cases)
+we can not use refs on custom component as default. to use it and expose functionality (like focus) from main react component to custom parent component through refs we use React.forwardRef and useImperativeHandle hook.
+
+react component get ref as an argument with props. (but we rarely use it. like in this case)
+this ref establish the connection with ref prop on custom parent component.
+we need to wrap react component in React.forwardRef().
+const componentName = React.forwardRef((props, ref) => {})
+
+import useImperativeHandle hook from React in main react component.
+
+useImperativeHandle takes two argument.
+1. ref
+2. function that returns an object with internal variable or internal function that we can use on parent custom component.
+(like {focus: functionName})
+( and we will use it in custom parent component using ref like nameRef.current.focus() )
+
+(with forwardRef and useImperativeHandle we can expose functionalities from main react component to custom parent component. so we can use main react component in custom parent component through refs and trigger certain functionalities.)
+
+//spread operator on element in react.
+we can apply props on element as default attribute by using spread operator.
+like,
+<Input input={{
+  id: 'xyz',
+  type: 'xyz',
+}} />
+
+on main input element we can use spread operator to apply these props as attribute. (spread all these props)
+
+<input {...props.input} />
+it will work like ( <input id='xyz' type='xyz' /> )
+
+//assets
+create assets folder in src. in that folder keep local assets like images.
+
+//react behind the scenes
+react reevalute the component only if state, props or context change. react compares the old and new snapshot and it tell the changes to react dom. react dom doesn't rerender the real dom with changes but only insert those specific changes to real dom.
+
+when react component reevalutes all the child components also reevalute because all those are just function calls. even if child component data doesn't change it will reevalute.
+these all ongoing function executions and virtual comparisons cause performance issue. even react is very fast and optimize for it. it is bad for apps.
+
+to solve this problem we can use memo(). when exporting component we wrap that export in memo()
+(export default memo(Component)).
+memo compares new props and previous prop on that component and if props doesn't change then that component won't reevalute even if parent component reevalute. and if that component doesn't reevalute then its childs won't reevalute. so we can prevent unnessesary component function executions using memo.
+
+but there is one important thing about memo.
+
+(premitive values are string, number, boolean, undefined, null, es6 symbol)
+(reference values are array, object, function) (functions and arrays are objects in javascript)
+
+two same premitive values are same. ('string' === 'string' (true))
+two same reference values are not same. ([array] === [array] (false))
+
+when component reevalutes it returns new values.
+when memo compares new and previous values on props. if values are premitive then for memo they are same so component won't reevalute. but if values are reference then for memo new and old values are different. so component will reevalute.
+
+to avoid this memo() problem we can use useCallback() hook.
+it takes 2 arguments. function and dependencies array.
+we can wrap our reference function in useCallback() so useCallback save that function in memory and reuse that same function when component reevalutes.
+(it will only recreate the function depending on dependencies array.)
+so function will never change and for memo() new and old values will be same. so that memo component won't reevalute.
+
+we use useCallback() for reference function. (wraps function)
+we have useMemo() for other reference values. (returns value)
+useMemo takes two argument. function which returns reference value and dependencies array.
+
+sometimes we don't want to run a specific function when component reevalute because of other value changes.(value that doesn't affect that function. like other prop changes.) we can return that function in useMemo() with dependencies. that function will not run when component reevalutes.
+
+//react state management
+when we create a state for a component react attach that state to that specific component. react memorize inital value of state and use it only for first execution. when component state changes component reevalutes but react doesn't recreate or reinitialize state like other values inside component. it just updates the state value as needed.
+
+//state schedules and batching
+when state changes react won't update state imediately but update state will be scheduled. most of the time it will update instantly. but react holds a right to postpond state update for more performance intensive task or higher priority tasks.
+but react guarantees the order of state updates. thats why to be sure we setState using prevState.
+
+when two or more state updating function are present in synchronise code like function, react will batch those state updates together. means react will batch those update in one single state schedule update (that single state schedule update will change those state). (component will reevalute once for one schedule update.)
+
+//class based components
+(to build error boundries we need class component. because right now error boundries require class based component.)
+
+we used to use class based component before react introduced hooks in 16.8 version. react hooks brings features to fuctional component which were previously reserved for class based component such as state.
+
+[
+import {Component} from 'react'
+
+class ComponentName extends Component {
+  render() {
+    return (something)
+  }
+}
+
+export default ComponentName
+]
+
+we need to import Component class from react to make class component work. so class component can extend Component class.
+
+(Component class adds important functionality to make class work as a component and use props in class component.(using this.props))
+
+to define the class we use {}. in there we define methods.
+we use render() method to define to be rendered output. react will call render() method when that component is used in JSX code.
+
+to use props in class component. we use this.props.
+
+//state in class component
+we use constuctor() in class component to do initialization work like initializing state.
+constuctor() will be called by react when class is used in JSX code as component.
+
+to initialize state we use this.state in constuctor().
+this state will be always an object. we group all the state in this object.
+
+(when we add constuctor to class and extend another class we need to add super() which calls the constuctor of super class.(constuctor of inherating class))
+
+constuctor() {
+  super()
+
+  this.state = {
+    propertyName: value
+  }
+}
+
+to update state we use this.setState() which always takes an object.
+this.setState({
+  propertyName: newValue
+})
+
+react will merge updated state with existing state. it doesn't override the state.
+thats why if state has multiple property and we update single property. only that property will update and other properties will be kept.
+
+if state update depends on prevState. we can use prevState function. which also always returns an object.
+
+this.setState((prevState) => {
+  return {
+    propertyName: prevState.propertyName
+  }
+})
+
+if we want to use state we use it by this.state.propertyName.
+
+//calling class methods
+(to refer this keyword inside method to surrounding class we can use .bind(this). because this keyword inside method wouldn't refer to surrounding class when calling it upon an event.)
+
+method() {
+  this.action
+}
+
+<button onClick={this.method.bind(this)}></button>
+
+(when above code is evaluated this keyword inside method is set to have same context or value as this (this which refers to surrounding class)).
+
+//class component lifecycle method
+componentDidMount() (useEffect(() => {}, []))
+componentDidUpdate() (useEffect(() => {}, [dependency]))
+componentWillUnmount() (useEffect(() => { return () => {} }, []))
+
+componentDidMount will execute only once when component renders for fisrt time.
+componentWillUnmount will execute right before component is removed from DOM.
+componentDidUpdate will execute when component updates (state,props,context).
+but to avoid unnessesary executions we check previous state or props to current state or props respectively.
+
+we get prevProps and prevState as argument in componentDidUpdate. then we check previous state or props is different from current state or props in if condition and there we execute logic.
+
+//context in class based components
+we provide context like before.
+but we can't use useContext() hook because we can't use hooks in class based component.
+
+1. we can use <Context.Consumer />.
+2. we can connect class based component to only one context. we can use some work around like wrapping the component in another component. but as default we can only connect to one context.
+
+we use context in class based component by adding static property and property name contextType and assign value of context.
+
+static contextType = someContext
+
+we can access that context by this.context.
+
+//Error Boundaries
+If something goes wrong in react app (like http request. when server doesn't respond then request can't be completed and error generate in application.) these type of errors cant't be prevented.
+in vanilla javascript we use try catch method.
+try {
+  //run code
+} catch(error) {
+  //handle error
+}
+
+but in react if error occurs in component and we can't handle in parent component.
+because if we try to use try catch in parent component. error component is not regular javascript. it is JSX.
+[
+  (this is not possible.)
+  try {
+    <ComponentWithError />
+  } catch(error) {
+    //handle error
+  }
+]
+
+in this case we can build and use error Boundaries.
+(error Boundaries can't be build in functional component for now. thats why we use class component to build error Boundaries.)
+we create ErrorBoundary.js component. (any name can be given to file.)
+in that component we implement componentDidCatch() lifecycle method.
+this lifecycle method makes any class based component an error Boundary.
+we return this.props.children in render method. so we can wrap error Boundary component around components we want to protect.
+
+componentDidCatch() gets error object as a argument automatically passed in by react.
+then we can define anything we want to do in that lifecycle method when error occurs. we can write different logic for different errors. (we can also make different error Boundary components for different errors.)
+
+but simply we can change state there. (like hasError: false)
+and depending on state we can return something in render method.
+[
+  render()  {
+    if (this.state.hasError) {
+      return <something/>
+    }
+    return this.props.children
+  }
+]
+
+//sending http request (connecting to a database)
+we can use javascript method fetch() to send http request.(GET or POST)
+fetch('url') (pass first argument as url string). we can define second argument as an object to configure various option such as request method (GET or POST). default method will be GET.
+[ default configuration for fetch()
+  {
+  method: default 'GET',
+  body: default null,
+  headers: default (empty object) {},
+  credentials: 'omit'
+}
+]
+fetch returns a promise. it is an asynchronise task. it does't finish imediately. so we can use promise or async await.
+
+promise = fetch('url').then((res) => {}).catch((error) => {})
+
+async await = async () => {
+  try {
+    const res = await fetch('url')
+    const data = await res.json()
+  } catch(error) {
+
+  }
+}
+
+we get response in json format. thats why to convert json to javascript object we use json() method on response.
+then we set that converted data to state and use it.
+
+we can check if !response.ok or response.status !== 200 and throw our own error message
+(throw new Error('message'))
+
+to catch error in promises we can add .catch((error) => {
+
+})
+
+to catch error in async await we can add try catch.
+(
+  try{
+
+  } catch(error) {
+    
+  }
+)
+
+(when we throw (generate) error and pass a string to constructor, that string will be stored in message property of the created error object.)
+(we can access our thrown error message in catch block by using error.message)
+
+//post request
+we use fetch('url', {
+  method: 'POST',
+  body: JSON.stringify(value),
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
+we create post request by adding second argument to fetch().
+we add object as second argument
+and set request method to 'POST'.
+
+post request will create resource.
+
+we add resource using body key. but body doesn't take javascript data. it needs json. so we convert our data to json format using JSON.stringify(data).
+
+we need to add headers to describe the content that will be sent. we add headers using headers key. we add object value to headers.
+and add header as 'Content-Type' set to 'application/json'
+(
+  headers: {
+    'Content-Type': 'application/json'
+  } 
+)
+
+//custom hooks
+custom hooks are just regular functions. but these custom hooks can have hooks inside them unlike regular functions.
+we can use these custom hooks to outsource stateful logic into reusable functions.
+
+create hooks folder. create use-hookName.js file.
+create function useHookName.
+(we must add use before function name. so it will give signal to react that it is a custom hook. it gives react a guaranty that we will use that function by respecting the rules of hooks. if we violet the hooks rule react will give us warning.)
+
+put our logic in there which we want to reuse.
+
+return anything which we want to use in our component. (like state, array, object, number, string, function etc.)
+whatever we return will get tied to component.
+it doesn't mean it will share return value across multiple components.
+instead for every component custom hook will execute and every component will recieve its own return value. only logic will get shared.
+
+to use custom hooks we import that hook and use destructuring to use that return value from custom hook into component.
+
+const [value, somethingElse] = useHookName()
+
+we can also pass arguments in custom hook to configure it. (just like any other function.)
+const [value, somethingElse] = useHookName(argument)
+
+[
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+//bind method
+
+we can use bind method to preconfigure the function.
+first argument to bind allows us to set (this) keyword in the to be executed function. if we don't want to set this keyword we can set first argument to null.
+second argument to bind will be the first argument recieved by to be executed function.
+any other arguments which might be passed by the place where function is actually being called will appended to the end of parameter list.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+]
+
+//forms and inputs
+validation
+on submit = allows user to enter valid value before warning him. avoid un warning but present feedback too late.
+losing focus = allows user to enter valid value before warning him. useful for untouched forms.
+on keystroke = warns user before user had a chance of entering valid values. we can use it on already invalid inputs.
+
+using custom hooks for forms is very useful. we can also use third party library like formik for forms.
+
+[
+/////////////////////////////////////////////////////////
+(custom hook)
+import { useState } from 'react';
+
+const UseInput = (validate) => {
+  const [inputValue, setInputValue] = useState('');
+  const [inputTouched, setInputTouched] = useState(false);
+
+  const inputIsValid = validate(inputValue);
+
+  const touched = () => {
+    setInputTouched(true);
+  };
+
+  const InputChangeHandler = (e) => {
+    setInputValue(e.target.value);
+  };
+  const reset = () => {
+    setInputTouched(false);
+    setInputValue('');
+  };
+
+  return {
+    inputValue,
+    inputTouched,
+    inputIsValid,
+    InputChangeHandler,
+    touched,
+    reset,
+  };
+};
+
+export default UseInput;
+
+/////////////////////////////////////////////////////////////////////////////////////////
+(form)
+import UseInput from './use-input';
+
+const validateName = (value) => {
+  return value.trim().length >= 3;
+};
+const validateEmail = (value) => {
+  return value.trim().includes('@');
+};
+const BasicForm = (props) => {
+  const {
+    inputValue: firstNameInputValue,
+    inputTouched: firstNameInputTouched,
+    inputIsValid: inputfirstNameIsValid,
+    InputChangeHandler: firstNameInputChangeHandler,
+    touched: nameTouched,
+    reset: resetName,
+  } = UseInput(validateName);
+  const {
+    inputValue: lastNameInputValue,
+    inputTouched: lastNameInputTouched,
+    inputIsValid: inputlastNameIsValid,
+    InputChangeHandler: lastNameInputChangeHandler,
+    touched: lastNameTouched,
+    reset: resetLastName,
+  } = UseInput(validateName);
+  const {
+    inputValue: emailInputValue,
+    inputTouched: emailInputTouched,
+    inputIsValid: inputemailIsValid,
+    InputChangeHandler: emailInputChangeHandler,
+    touched: emailTouched,
+    reset: resetEmail,
+  } = UseInput(validateEmail);
+
+  const formIsValid =
+    inputfirstNameIsValid && inputlastNameIsValid && inputemailIsValid;
+  const submitHandler = (e) => {
+    e.preventDefault();
+    nameTouched();
+    lastNameTouched();
+    emailTouched();
+    if (!formIsValid) {
+      return;
+    }
+    resetName();
+    resetLastName();
+    resetEmail();
+  };
+  return (
+    <form onSubmit={submitHandler}>
+      <div className='control-group'>
+        <div
+          className={`form-control ${
+            !inputfirstNameIsValid && firstNameInputTouched && 'invalid'
+          }`}
+        >
+          <label htmlFor='name'>First Name</label>
+          <input
+            type='text'
+            id='name'
+            onChange={firstNameInputChangeHandler}
+            value={firstNameInputValue}
+          />
+          {!inputfirstNameIsValid && firstNameInputTouched && (
+            <p className='error-text'>Invalid Name</p>
+          )}
+        </div>
+        <div
+          className={`form-control ${
+            !inputlastNameIsValid && lastNameInputTouched && 'invalid'
+          }`}
+        >
+          <label htmlFor='name'>Last Name</label>
+          <input
+            type='text'
+            id='name'
+            onChange={lastNameInputChangeHandler}
+            value={lastNameInputValue}
+          />
+          {!inputlastNameIsValid && lastNameInputTouched && (
+            <p className='error-text'>Invalid Last Name</p>
+          )}
+        </div>
+      </div>
+      <div
+        className={`form-control ${
+          !inputemailIsValid && emailInputTouched && 'invalid'
+        }`}
+      >
+        <label htmlFor='name'>E-Mail Address</label>
+        <input
+          type='text'
+          id='name'
+          onChange={emailInputChangeHandler}
+          value={emailInputValue}
+        />
+        {!inputemailIsValid && emailInputTouched && (
+          <p className='error-text'>Invalid Email</p>
+        )}
+      </div>
+      <div className='form-actions'>
+        <button>Submit</button>
+      </div>
+    </form>
+  );
+};
+
+export default BasicForm;
+
+/////////////////////////////////////////////////////////
+]
+
+//Modal problem
+on click - e.stopPropagation()
+(event bubbling - prevent clicks on modal from bubbling to backdrop)
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Deploying React apps
+
+//deployment steps
+1. test code
+2. optimize code
+3. build app for production
+4. upload production code to server
+5. configure server
+
+//optimize code
+after testing we should optimize our code by using best practices, React.memo, useMemo, useCallback, React.lazy and React.Suspense etc.
+
+//build production app
+'num run build' will execute script and gives a minimize and optimized version of app in build folder. we need to move these files in build folder on server so our application can run on the server.
+
+//we can use any service for deployment like netlify, vercel, github and firebase etc.
+
+//configuring server
+we need to configure server for single page application. because all the routing is managed on client side.
+server return different responses for different urls. but in case of single page app server only have one main domain url and other urls are managed on client side.
+
+we need to configure server so it will ignore the path after main domain for request and always return the same html and javascript file. then when react app starts it will take another look at url and loads correct content.
+
+//Authentication
+Authentication is needed if content should be protected. (not accessible by everyone)
+content can be page or api endpoint.
+Authentication is two step process
+1. get access / permission
+2. send request to protected resources
+
+when we request server for permission, the server will check and grants or denies permission. server will send yes or no to client browser depending on check. but only yes or no is not enough. because it is easy to fake yes result and send fake yes to the server to request protected data.
+
+thats why we should use server side sessions or Authentication tokens
+
+server side sessions:-
+it stores unique indentifire on server and send the same to client and then client sends request along with indentifire to protected resources.
+but server should be stateless. it should not store some indentifire on server.
+
+Authentication tokens:- (JSON web token)
+it creates a permission token on server and send it to client but doesn't store it on server. it has key to hash token which is a encoded string data.
+client sends request along with token to access protected resources and server will know if this token is created by it. if token is created by different key then server will detect it.
+
+(these "tokens" are really just long strings which are constructed by an algorithm that encodes data into a string (with help of a private key, only known by the server).)
+
+//navigation gaurds
+we can conditionally configure Route depending on Authentication status.
+
+(
+  <Switch>
+    <Route path='/' exact>
+      <HomePage />
+    </Route>
+    {!authCtx.isLoggedIn && (
+      <Route path='/auth'>
+        <AuthPage />
+      </Route>
+    )}
+    <Route path='/profile'>
+      {authCtx.isLoggedIn ? <UserProfile /> : <Redirect to='/auth' />}
+    </Route>
+    <Route path='*'>
+      <Redirect to='/' />
+    </Route>
+  </Switch>
+)
+
+//persisting the Authentication status
+we can use cookies or local storage to store token and use it if we reload page or come back after some time without logging out.
+
+localStorage is a synchronous api, hence we dont even have to use useEffect.
+
+we should clear token stored in local storage when logging out.

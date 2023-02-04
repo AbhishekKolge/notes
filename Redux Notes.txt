@@ -1,0 +1,376 @@
+//Redux is state management librery for react. it manages cross component or app wide state.
+there are three kind of states.
+1. local state
+2. cross component state
+3. app wide state
+
+//redux flow
+we create a central store.
+component that depends on state changes suscribes to central store.
+reducer function will mutate the state which is stored in central store.
+to mutate state from component we dispatch actions which is an object which describes the operation the reducer should perform.
+redux will forward actions to reducer and reducer will perform these actions and spits out the new state which will replace existing state stored in central store.
+suscribing components get notified when state in central store changes.
+
+we create store by using redux object. on that object we call createStore().
+this store manages data. that data is determined by reducer function. reducer function will produce new state snapshot whenever the action reaches it. when we run code for first time reducer function will be executed with default action that spits out initial state.
+
+we create reducer function which receives two argument by default.
+1. previous state snapshot
+2. dispatched actions
+
+reducer function will always return a new state object. (it can be anything like string or number. but often it is an object.)
+reducer function is a pure function. means same input value always should produce same output.
+reducer function should not have any side effects like http request, write something to local storage or fetch from local storage.
+
+we point that reducer function in createStore argument. so store can know which reducer function is responsible for changing that store.
+
+to suscribe we use suscriber function with state.getState() which gives lastest state snapshot after it is updated.
+getState() is method available on store which is created using createStore().
+whenever state is updated suscriber function is executed and we get lastest state by getState()
+
+but redux executes reducer function and suscriber fuction. react should know that execute the suscriber function whenever state changes. for that we use suscribe() method on store. which takes suscriber function as argument, which redux will execute when store data changes.
+
+we should pass default state in reducer function. because when reducer function executes for first time it should have default value to work with.
+
+we dispatch action using dispatch() method on store.
+dispatch takes action as argument. action is a javascript object with a type property. this type property acts as indentifire. we use unique string as type value.
+
+in reducer function depending on action type we can return mutated state.
+
+[
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+    const nameReducer = (state = initialDefaultState, action) => {
+        if(action.type === 'unique string') {
+            return {
+                newState: state.newState + 1
+            }
+        }
+
+        return oldState
+    }
+
+    const store = redux.createStore(nameReducer)
+
+    const nameSuscriber = () => {
+        store.getState()
+    }
+
+    store.subscribe(nameSubscriber)
+
+    store.dispatch({
+        type: 'unique string'
+    })
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+]
+
+//redux
+npm install redux react-redux (redux and react-redux are separate)
+(redux is not react specific. it can be used in any javascript project. it doesn't know anything about react. to make working with redux in react application easier we install react-redux. it makes connecting react to redux simple.)
+
+//using redux in react
+
+create store folder in src with js file inside.
+
+[
+    ///////////////////////////////
+    import redux from 'redux'
+
+const reducerFunction = (state = {default state}, action) {
+    depending on action type return state
+
+    return default state
+}
+
+const reduxStore = redux.createStore(reducerFunction)
+
+export default reduxStore
+    //////////////////////////////
+]
+
+now to provide the store we go the highest level in our react app and wrap the element with provider. (we get provider from react-redux)
+
+(we get store prop on provider which takes redux store as value)
+
+(the component we wrapped and its child component will get access to redux store.)
+
+import {Provider} from 'react-redux'
+import reduxStore from './store'
+
+
+<Provider store={reduxStore}><element /></Provider>
+
+//using redux data in functional component
+
+we use useSelector hook from react-redux
+(we can also use useStore hook from react-redux)
+useStore gives direct access to the store but useSelector is more convienient because it allows us to select part of state managed by store.
+
+when we use useSelector, react-redux will automatically sets up a subcription to redux for the component where we use it. when component unmounts react-redux will automatically clear the subcription.
+
+we pass a function to useSelector(function). this function will be executed by react-redux. this function determines which piece of data we want to extract from store.this function will receive a state managed by redux and return part of the state we want to extract.
+so at the end useSelector gives us return value which can we store in a variable.
+and we can use that variable (return value) wherever we want.
+
+//dispatching actions
+we can use useDispatch hook from react-redux
+
+useDispatch gives back a dispatch function. this function we can use to dispatch actions against redux store.
+
+we pass action object to dispatch function. ( dispatch({type: 'unique string'}) )
+
+[
+    /////////////////////////////////
+    import {useSelector, useDispatch} from 'react-redux'
+
+    const Component =() => {
+        const dispatch = useDispatch()
+        const something = useSelector((state) => {
+                                        return state.something
+                                    })
+
+        const doSomething = () => {
+            dispatch({type: 'unique string'})
+        }
+    return <div>
+                <element>{something}</element>
+                <button onClick={doSomething}></button>
+            </div>
+    }
+    /////////////////////////////////
+]
+
+//using redux data in class component
+(we can use connect in functional component too. but in functional component using hooks is more convienient.)
+we use connect function from react-redux. when we use connect, react redux will set up a subsciption and manages it.
+
+connect is higher order component which takes two functions as arguments and returns a new function. we pass our component to that return function. (pass component while exporting.)
+two functions we pass to connect are functions which map state and dispatch function as props to our component. a component which we pass to return function.
+
+1. mapStateToProps receives state as argument as default and returns an object. on that object keys will be available as props on receiving component. and value of keys will be state we want to access.
+2. mapDispatchToProps receives dispatch function as argument as default and returns an object. on that object keys will be available as props on receiving component. and value of keys will be another function where we call dispatch function.
+(keys value will be function so we can execute dispatch function).
+
+[
+    /////////////////////////////////
+    import {Component} from 'react'
+    import {connect} from 'react-redux'
+
+    class Component extends Component {
+
+        doSomething () {
+            this.props.doSomething()
+        }
+        
+        render() {
+            return <div>
+                <element>{this.props.something}</element>
+                <button onClick={this.doSomething.bind(this)}></button>
+            </div>
+        }
+    
+    }
+
+    const mapStateToProps = (state) => {
+        return {
+            something: state.something
+        }
+    }
+
+    const mapDispatchToProps = (dispatch) => {
+        return {
+            doSomething: () => {
+                dispatch({type:'unique string'})
+            }
+        }
+    }
+
+    export default connect(mapStateToProps, mapDispatchToProps)(Component)
+    /////////////////////////////////
+]
+
+(we use bind(this), so this keyword inside method refers to class)
+
+//payload to action
+we can add extra payload to our action by passing them as property in action object.
+dispatch({
+    type: 'unique string',
+    value: something
+    })
+
+//multiple state in redux
+we can add multiple state in redux store by passing new property in state object.
+(redux doesn't merge old state with new state. instead it replaces old state with new state.)
+never mutate existing state in redux (it will lead to bugs. because arrays and objects are reference type). we should always return new state object which will replace old state object.
+
+we can access multiple state properties of redux store in component by using useSelector multiple times for extracting different pieces of state.
+
+//redux toolkit
+we can get into problems for maintaining state in redux in large application. we can have lot of typos.
+for typos in action type we can store and export a constant which will store action type. but still there are other problems with copying old state.
+while returning new state object we can do some miskates. there are third party libraries to help us copying the old state and dont accidently edit it. but we dont need those anymore. because there is a library called redux toolkit.
+with redux toolkit working with redux is easier.
+
+//using redux toolkit (recommended to use instead of plain redux)
+npm install @reduxjs/toolkit
+
+when we install redux toolkit, we dont need to install redux separatly. redux toolkit comes with redux.
+
+import {createSlice} from '@reduxjs/toolkit'
+we can also import createReducer. but createSlice is more powerful.
+
+createSlice wants object as argument. by using createSlice we are preparing slice of global state.
+1. every slice needs a name as indentifire for that piece of state.
+2. initialState as default state object
+3. reducers. reducers will be an object (map) of all the reducers that state slice needs.
+in that object we add methods. these method will be automatically called by redux. these method get latest state and action as default argument (we dont need to write action as argument where we are not using payload). in these methods we are allowed to mutate state. because behind the scenes redux toolkit internally uses a package called emmer which will detect if we are mutating state and automatically clone the existing state. it will keep all the other state which we are not editing and override the state we are editing in immutable way.
+
+we store return value of calling createSlice in variable.
+
+createStore() can have only one slice reducer. when we have multiple slices we cant use createStore(). we can import combineReducers from redux. but we can use better approch. we can import configureStore from @reduxjs/toolkit. it also creates a store. but it makes multiple reducers into a single reducer.
+
+to register this slice of state with redux store, we pass that slice.reducer to configureStore({}). configureStore gets object as argument. it is a configuration object expected by configureStore.
+in that configuration object we set a reducer property. value of reducer property can be a single slice reducer or an object of multiple slice reducers.
+
+//dispatching action in redux toolkit
+createSlice also got us covered for dispatching actions. it automatically adds unique action indentifires for different reducer methods.
+we can get hold of these indentifires by .actions on slice reducer function.
+
+(someSlice.actions.doSomething()) --- it returns an object like {type: 'some auto generated unique indentifire'}. thats why these methods are called action creators. it create action object for us with type property automatically.
+
+we store these action creators in variable like someActions = someSlice.actions, then export it.
+
+now the component where we need the actions, we import it.
+and in there we execute methods of that action in dispatch function.
+
+(like dispatch(someActions.doSomething()))
+
+to add payload we pass payload data to action method
+(like dispatch(someActions.doSomething(payloadData)))
+
+behind the scenes it will create action object like
+{type: 'unique indentifier', payload: payloadData}
+
+(keep in mind we can access that payloadData in reducer function by action.payload)
+
+//splitting redux store logic
+we should make index.js file in main store and put configureStore there.
+we should put all the slice logic in different files. (sliceName-slice.js) we export actions and reducer from there.
+and import actions whenever we need.
+import reducer in main index.js file in store to use it in configureStore.
+
+//////////////////////////////////////////////////////////////////////////////////
+
+import {createSlice, configureStore} from '@reduxjs/toolkit'
+
+const someSlice = createSlice({
+    name: 'someName',
+    initialState: {someState1: '', someState2: ''},
+    reducers: {
+        doSomething(state, action) {
+            someState1 = someState1 + 1
+        },
+        doSomething(state, action) {
+            someState2 = someState2 +  action.something
+        }
+    }
+})
+
+const store  = configureStore({
+    reducer: {
+        someName: someSlice.reducer
+    }
+})
+
+export const someActions = someSlice.actions
+
+export default store
+
+////////////////////////////////////////////////
+
+//side effects and asynchronise code
+reducer function must be pure, side effect free and synchronous.
+side effects and async tasks should be executed in-
+1. inside the component (useEffect)
+2. inside action creators created by us. (not created by redux)
+
+we should never write side effect or async code inside reducers.
+
+//
+1. useEffect. we write side effects in useEffect inside component or root component.
+
+like making a api request,
+const App = () => {
+    const someReduxState = useSelector((state) => state.someState)
+
+    useEffect(() => {
+        fetch('https://api-request', {
+            method: 'PUT',
+            body: JSON.stringify(someReduxState)
+        })
+    }, [someReduxState])
+
+    return (
+        <div></div>
+    )
+}
+
+in above example we are changing redux state. after that state change the component reevalutes and useEffect runs and api request is made.
+(
+to avoid useEffect running (making api request indirectly) when component loads for the first time. we can use,
+
+let isInitial = true. [we define it outside component function so it wont change and reinitialize when component reevalutes.]
+
+const Component = () => {
+    useEffect(() => {
+        if(isInitial) {
+            isInitial = false
+            return //it will return from function execution and stop running the next code.
+        }
+        //api request
+    },[])
+
+    return <div></div>
+}
+)
+we have separated the data translation logic in redux and side effect logic in component.
+
+//
+2.action creator thunk (better way)
+it is a function that delays an action until something else finish.
+it doesnt return action itself but it returns another function that returns an action. so we can run some other code before dispatching action.
+
+we define it inside redux.
+
+[///////////////////
+
+export const someThunk = (argument if we want. in our case (someReduxState)) => {
+
+    return (dispatch) => {
+        dispatch(anyAction())
+
+        fetch('https://api-request', {
+            method: 'PUT',
+            body: JSON.stringify(someReduxState)
+        })
+
+        dispatch(anyOtherAction())
+    }
+
+}
+
+///////////////////////
+
+dispatch(someThunk(argument))
+
+we can use above action creator thunk (dispatch it like any other action creator).
+redux is prepared for that. if it sees that we are dispatching a action that is a function instead of an action object, it will execute the return function and will give us dispatch argument automatically so inside that executed function we can dispatch an action. because it is a common pattern that we wanna have action creators that can perform side effects and can dispatch other actions which eventually reach reducer as a part of flow of side effects or as a flow of steps that should be taken.
+
+we should save thunks in different files in store. (something.actions.js)
+
+
+///////////////////]
+
+//use redux devtools for debugging redux. with only redux it requires extra setup code. but with redux toolkit it works out of the box.
