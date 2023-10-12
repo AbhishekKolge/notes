@@ -1,14 +1,24 @@
 typescript's type system only helps during development. (before code gets compiled)
 
+the key difference is javascript uses dynamic types which are resolved at runtime, typescript uses static types which are set during development.
+
+install typescript compiler using,
+npm install -g typescript
+
+to compile typescript file to javascript
+tsc file.ts
+
 //core types
+(The core primitive types in TypeScript are all lowercase.)
 
 1. number - 1,5.3,-10 - all numbers, no differentiation between integers or floats.
 2. string - 'hi', "hi", `hi` - all text values
 3. boolean - true, false - no truthy or falsy values.
 4. object - {age: 30} - any javascript object, more specific types (type of object) are possible
-5. array - [1,2,3] - any javascript array, type can be flexible or strict (regarding the element types)6. tuple - added by typescript: fixed length array
-6. enum (custom type) - enum Value {NEW, OLD} - added by typescript: automatically enumerated global constant identifiers
-7. any - any kind of value, no specific type assignment
+5. array - [1,2,3] - any javascript array, type can be flexible or strict (regarding the element types)
+6. tuple - added by typescript: fixed length and type array
+7. enum (custom type) - enum Value {NEW, OLD} - added by typescript: automatically enumerated global constant identifiers
+8. any - any kind of value, no specific type assignment
 
 if we create a variable with unassigned way then we need to aside it with type.
 (
@@ -30,6 +40,32 @@ object = {
   name: 'abhishek',
   age: 25,
 };
+
+//Of course object types can also be created for nested objects.
+
+Let's say you have this JavaScript object:
+
+const product = {
+  id: 'abc1',
+  price: 12.99,
+  tags: ['great-offer', 'hot-and-new'],
+  details: {
+    title: 'Red Carpet',
+    description: 'A great carpet - almost brand-new!'
+  }
+}
+This would be the type of such an object:
+
+{
+  id: string;
+  price: number;
+  tags: string[];
+  details: {
+    title: string;
+    description: string;
+  }
+}
+So you have an object type in an object type so to say.
 
 //arrays
 
@@ -56,7 +92,7 @@ tuple = ['test', 1]
 
 //enums (custom type)
 enum Value {SOMETHING, SOMETHING2}
-(identifiers automatically gets value of 1 and 2 respectively)
+(identifiers automatically gets value of 0 and 1 respectively)
 
 enum Value {SOMETHING = 5, SOMETHING2}
 (we can also set manual value and next identifier will get incremented value from previous value)
@@ -152,7 +188,7 @@ we can define function type by using 'Function' as a type.
 but it can be any function. we should be clear about what type of function it should be.
 we can set the function type using,
 
-let value = (num1: number, num2: numbers) => number
+let value: (num1: number, num2: numbers) => number
 (in parameter we can give any name with type defined and provide return type)
 
 //function type and callbacks
@@ -168,7 +204,7 @@ add(1, 2, (num) => {
 })
 
 //unknown type
-unknown is similar to any time. any is very flexible type but unknown is restrictive because with unknown we need to add extra runtime type checking.
+unknown is similar to any type. any is very flexible type but unknown is restrictive because with unknown we need to add extra runtime type checking.
 we should't use unknown always. but we can use it if we want to be more restrictive when we dont know the type in advance, but we know, what we want to do with it eventually.
 
 let someVariable = unknown
@@ -201,3 +237,26 @@ const infiniteLoopFunction = (): never => {
         console.log('never');
     }
 }
+
+///////////////////////////////////////////////////////////////
+//typescript watch mode for single file
+tsc main.js --watch
+or
+tsc main.js -w
+
+//create ts config
+it will help us to compile all the files at once
+tsc --init
+then
+tsc -w
+
+//ts configuration
+//exclude
+by default node_modules are excluded from compilation if we dont specify exclude option.
+if we specify exclude option incase we want to exclude some folder then we need to add node_modules manually in exclude option.
+//include
+if we want to compile specific folder only then we can use this option. if we specify a folder in include and its subfolder is inside exclude then subfolder wont get compiled. means compile include minus exclude.
+//files
+we can use this option if we want to compile specific file instead of entire folder.
+
+//compiler options

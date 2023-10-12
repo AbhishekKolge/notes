@@ -1,0 +1,249 @@
+//typing props
+type SomeProps = {
+    name: string
+}
+
+use types when building applications and interfaces when building libraries.
+
+//basic props
+//object
+type PersonProps = {
+    name: {
+        first: string
+        last: string
+    }
+}
+
+//array
+type PersonListProps = {
+    name {
+        first: string
+        last: string
+    }[]
+}
+
+//advanced props
+//union
+type StatusProps = {
+    status: "loading" | "success" | "error"
+}
+
+//children props
+
+type HeadingProps = {
+    children: string
+}
+
+//if child is another react component
+there are few types that we can specify but safest bet is React.ReactNode which is the type provided by @types/react package.
+
+type OscarProps = {
+    children: React.ReactNode
+}
+
+//optional type
+type GreetProps = {
+    name: string
+    messageCount?: number
+    isLoggedIn: boolean
+}
+
+//event props
+when function doesn't accept parameters and doesn't return a value, we can give it a type,
+() => void
+
+type ButtonProps = {
+    handleClick: () => void
+}
+
+//click event
+we can use type provided by @types/react which is React.MouseEvent.
+we can also be more specific by mentioning it is a button click by adding HTMLButtonElement. we don't need to import it because it is available in typescript environment.
+
+type ButtonProps = {
+    handleClick: (e: React.MouseEvent<HTMLButtonElement>) => void
+}
+
+//change event
+type InputProps = {
+    value: string
+    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+//style props
+type ContainerProps = {
+    styles: React.CSSProperties
+}
+
+//exporting types
+create file Something.types.ts
+
+export type PersonProps = {
+    name: {
+        first: string
+        last: string
+    }
+}
+
+or
+
+type PersonProps = {
+    name: {
+        first: string
+        last: string
+    }
+}
+
+export type {PersonProps}
+
+//reusing types
+type Name = {
+    first: string
+    last: string
+}
+
+type PersonProps = {
+    name: Name
+}
+
+//useState future value
+type AuthUser = {
+    name: string
+    email: string
+}
+
+const [user, setUser] = useState<AuthUser | null>(null)
+
+//type assertion
+if we know that user's value will be set after the setup and will always have a value after, then we can use type assertion.
+
+type AuthUser = {
+    name: string
+    email: string
+}
+
+const [user, setUser] = useState<AuthUser>({} as AuthUser)
+
+//useReducer
+
+type CounterState = {
+    count: number
+}
+
+//here for increment and decrement payload is required, for reset it is not required.
+We can add optional chaining but we need to mark (action?.payload) or (action.payload || 0).
+here for better typing we can use discriminated unions in typescript.
+
+(
+    /////////////////
+    type CounterAction = {
+        type: 'increment' | 'decrement'
+        payload: number
+    }
+)
+
+type UpdateAction = {
+        type: 'increment' | 'decrement'
+        payload: number
+}
+
+type ResetAction = {
+        type: 'reset'
+}
+
+type CounterAction = UpdateAction | ResetAction
+
+const initialState = {count: 0}
+
+const reducer = (state: CounterState,action: CounterAction) => {
+    switch(action.type) {
+        case: 'increment': {
+            return {count: state.count + action.payload}
+        }
+        case: 'decrement': {
+            return {count: state.count - action.payload}
+        }
+        case: 'reset': {
+            return initialState
+        }
+        default: {
+            return state
+        }
+    }
+}
+
+const [state, dispatch] = useReducer(reducer, initialState)
+
+//useRef
+//if we are sure that reference is never null when we access it, we can add non null assertion when invoking useRef (null!). it allows us to call focus without optional chaining.
+
+const inputRef = useRef<HTMLInputElement>(null!)
+
+useEffect(() => {
+    inputRef.current.focus()
+},[])
+
+return <input ref={inputRef}/>
+
+//react component
+React.ComponentType
+
+if we have to pass in component prop, use React.ComponentType and if that component itself accepts props then specify the prop type in <>
+
+React.ComponentType<SomeProps>
+
+//generic types
+type ListProps<T> = {
+    items: T[],
+    onClick: (value: T) => void
+}
+
+const List = <T extends string | number>({items, onClick}: ListProps<T>)
+
+or
+
+const List = <T extends {id: number}>({items, onClick}: ListProps<T>)
+
+//{} (object) means least restrictions
+//for object id will be always required
+
+//restricting props
+type RandomNumberType = {
+    value: number
+}
+
+type PositiveNumber = RandomNumberType & {
+    isPositive: boolean
+    isNegative?: never
+}
+
+
+type NegativeNumber = RandomNumberType & {
+    isNegative: boolean
+    isPositive?: never
+}
+
+type RandomNumberProps = PositiveNumber | NegativeNumber
+
+//Template literals and exclude
+type HorizontalPosition = 'left' | 'center' | 'right'
+type VerticalPosition = 'top' | 'center' | 'bottom'
+
+type ToastProps = {
+    position: Exclude<`${HorizontalPosition}-${VerticalPosition}`, 'center-center'> | 'center'
+}
+
+//wrapping HTML elements
+type ButtonProps = {
+    variant: 'primary' | 'secondary'
+    children: string
+} & Omit<React.ComponentProps<'button'>, 'children'>
+
+//extracting components prop types
+extract prop types from one component and use them as prop types in another component
+
+import {Greet} from '../Greet'
+
+const CustomComponent = (props: React.ComponentProps<typeof Greet>) => {
+    ...
+}
